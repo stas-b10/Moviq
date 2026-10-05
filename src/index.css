@@ -1,1 +1,89 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "BebasNeue-Regular";
+  src: url("./assets/fonts/BebasNeue-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bebas-neue-regular {
+  font-family: "BebasNeue-Regular", sans-serif;
+}
+
+@font-face {
+  font-family: "Inter-Bold";
+  src: url("./assets/fonts/Inter-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+.inter-bold {
+  font-family: "Inter-Bold", sans-serif;
+}
+
+@font-face {
+  font-family: "Inter-Regular";
+  src: url("./assets/fonts/Inter-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+.inter-regular {
+  font-family: "Inter-Regular", sans-serif;
+}
+
+@font-face {
+  font-family: "SpaceGrotesk-Bold";
+  src: url("./assets/fonts/SpaceGrotesk-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+.space-grotesk-bold {
+  font-family: "SpaceGrotesk-Bold", sans-serif;
+}
+
+@font-face {
+  font-family: "SpaceGrotesk-Light";
+  src: url("./assets/fonts/SpaceGrotesk-Light.ttf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+.space-grotesk-light {
+  font-family: "SpaceGrotesk-Light", sans-serif;
+}
+
+@font-face {
+  font-family: "SpaceGrotesk-Medium";
+  src: url("./assets/fonts/SpaceGrotesk-Medium.ttf");
+  font-weight: 500;
+  font-style: normal;
+}
+
+.space-grotesk-medium {
+  font-family: "SpaceGrotesk-Medium", sans-serif;
+}
+
+@font-face {
+  font-family: "SpaceGrotesk-Regular";
+  src: url("./assets/fonts/SpaceGrotesk-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+.space-grotesk-regular {
+  font-family: "SpaceGrotesk-Regular", sans-serif;
+}
+
+@font-face {
+  font-family: "SpaceGrotesk-SemiBold";
+  src: url("./assets/fonts/SpaceGrotesk-SemiBold.ttf");
+  font-weight: 600;
+  font-style: normal;
+}
+
+.space-grotesk-semi-bold {
+  font-family: "SpaceGrotesk-SemiBold", sans-serif;
+}
