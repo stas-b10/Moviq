@@ -4,6 +4,8 @@ import Footer from './components/Footer'
 import Home from './Page/Home'
 import Auth from "./Page/Auth";
 import Avatars from './Page/Avatars';
+import SuccesfulRegistry from "./Page/SuccesfulRegistry"
+import SuccesfulLogged from './Page/SuccesfulLogged';
 
 function App() {
   const location = useLocation();
@@ -15,6 +17,8 @@ function App() {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Auth />} />
             <Route path="/avatars" element={<Avatars />} />
+            <Route path='/succesfully_registration' element={<SuccesfulRegistry />} />
+            <Route path='succesful_logged' element={<SuccesfulLogged />} />
             <Route path="/home" element={<Home />} />
          </Routes>
       </main>

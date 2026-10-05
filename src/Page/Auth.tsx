@@ -112,7 +112,7 @@ export default function Auth() {
         return;
       }
 
-      navigate("/avatars");
+      navigate("/succesful_logged");
     } catch {
       setError("An error occurred during login. Please try again.");
     } finally {
@@ -245,7 +245,13 @@ export default function Auth() {
               </button>
               </motion.div>
 
-              <motion.button className="mt-2 font-semibold text-gray-400 cursor-pointer" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
+              {error && (
+                <p className="text-center text-sm text-red-500">
+                  {error}
+                </p>
+              )}
+
+              <motion.button className="font-semibold text-gray-400 cursor-pointer" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
                 forgot password?
               </motion.button>
 
