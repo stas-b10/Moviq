@@ -132,7 +132,7 @@ const handleGoogleLogin = async (action: "login" | "register") => {
                 </p>
               )}
 
-              <motion.button className="font-semibold text-gray-400 cursor-pointer" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
+              <motion.button type="button" onClick={() => navigate("/forgot_password")} className="font-semibold text-gray-400 cursor-pointer" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
                 forgot password?
               </motion.button>
 
