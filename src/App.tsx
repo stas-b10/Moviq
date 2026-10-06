@@ -6,6 +6,8 @@ import Auth from "./Page/Auth";
 import Avatars from './Page/Avatars';
 import SuccesfulRegistry from "./Page/SuccesfulRegistry"
 import SuccesfulLogged from './Page/SuccesfulLogged';
+import AuthCallback from './Page/AuthCallBack';
+import ProfileSet from "./Page/ProfileSet";
 
 function App() {
   const location = useLocation();
@@ -18,7 +20,9 @@ function App() {
             <Route path="/" element={<Auth />} />
             <Route path="/avatars" element={<Avatars />} />
             <Route path='/succesfully_registration' element={<SuccesfulRegistry />} />
-            <Route path='succesful_logged' element={<SuccesfulLogged />} />
+            <Route path='/succesful_logged' element={<SuccesfulLogged />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/profile-set" element={<ProfileSet />} />
             <Route path="/home" element={<Home />} />
          </Routes>
       </main>

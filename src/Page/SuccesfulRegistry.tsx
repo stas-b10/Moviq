@@ -70,7 +70,7 @@ export default function SuccesfulRegistry() {
           </p>
         )}
         <motion.h1 className="space-grotesk-medium mt-12 text-center text-white text-[32px]" initial={{ opacity: 0, x: -80 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
-          Your account has been successfully created
+          Your account has been successfully created,now complete the last step by pressing on the confirmation link we send to your email.
         </motion.h1>
       </div>
        <img src={patrick} alt="" className="absolute bottom-10 left-10 w-[180px] md:w-[260px]"/>
