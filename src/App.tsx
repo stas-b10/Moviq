@@ -9,6 +9,8 @@ import SuccesfulLogged from './Page/SuccesfulLogged';
 import AuthCallback from './Page/AuthCallBack';
 import ProfileSet from "./Page/ProfileSet";
 import ForgotPassword from "./Page/ForgotPassword";
+import ResetPassword from "./Page/ResetPassword";
+import SuccesfulReseted from './Page/SuccsefulReseted';
 
 function App() {
   const location = useLocation();
@@ -22,9 +24,11 @@ function App() {
             <Route path="/avatars" element={<Avatars />} />
             <Route path='/succesfully_registration' element={<SuccesfulRegistry />} />
             <Route path='/succesful_logged' element={<SuccesfulLogged />} />
+            <Route path='/succesful_reseted' element={<SuccesfulReseted />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/profile_set" element={<ProfileSet />} />
             <Route path="/forgot_password" element={<ForgotPassword />} />
+            <Route path="/reset_password" element={<ResetPassword />} />
             <Route path="/home" element={<Home />} />
          </Routes>
       </main>

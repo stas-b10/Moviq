@@ -46,7 +46,7 @@ export default function AuthCallback() {
 
       if (!profile) {
         sessionStorage.removeItem("google_auth_action");
-        navigate("/profile-set", { replace: true });
+        navigate("/profile_set", { replace: true });
         return;
       }
 
