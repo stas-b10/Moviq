@@ -14,6 +14,7 @@ import ForgotPassword from "./Page/ForgotPassword";
 import ResetPassword from "./Page/ResetPassword";
 import SuccesfulReseted from './Page/SuccsefulReseted';
 import Profile from './Page/Profile'
+import About from './Page/About'
 
 function App() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function App() {
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset_password" element={<ResetPassword />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<About />} />
             <Route path="/home" element={<Home />} />
          </Routes>
       </main>

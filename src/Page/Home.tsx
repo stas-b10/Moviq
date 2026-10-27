@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 
 export default function Home() {
@@ -16,8 +16,8 @@ export default function Home() {
   };
 
   return (
-    <div>
-    <section className="relative h-screen overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+    <div className="relative h-screen overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+    <section className="">
       
       <p className="mt-30 text-center text-3xl font-bold">
         Welcome to the Home Page
@@ -28,6 +28,17 @@ export default function Home() {
         </button>
       </div>
     </section>
+
+
+    {/* last section */}
+    <section className="mt-16 text-center">
+    <Link
+      to="/about"
+      className="text-xl font-semibold text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+    >
+      About
+    </Link>
+  </section>
     </div>
   );
 }
