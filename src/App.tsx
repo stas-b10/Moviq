@@ -1,4 +1,6 @@
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { supabase } from './utils/supabase'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './Page/Home'
@@ -14,10 +16,30 @@ import SuccesfulReseted from './Page/SuccsefulReseted';
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const hideLayout = ["/","/succesfully_registration","/succesful_logged","/succesful_reseted","/auth/callback","/profile_set","/avatars","/auth/callback","/forgot_password","/reset_password"].includes(location.pathname);
+
+  useEffect(() => {
+  const checkSession = async () => {
+    if (location.pathname !== "/") {
+      return;
+    }
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      navigate("/home", { replace: true });
+    }
+  };
+
+  checkSession();
+}, [location.pathname, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="min-h-screen bg-white text-black dark:bg-[#121212] dark:text-white transition-colors duration-300 flex flex-col">
+      {!hideLayout && <Navbar />}
       <main className="flex-1">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Auth />} />
@@ -32,7 +54,7 @@ function App() {
             <Route path="/home" element={<Home />} />
          </Routes>
       </main>
-      <Footer />
+      {hideLayout && <Footer />}
     </div>
   );
 }

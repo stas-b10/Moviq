@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "../utils/supabase";
-import leo from "../assets/images/Leonardo_2012.webp"
-import rapha from "../assets/images/raphael.png"
-import donnie from "../assets/images/donatello.png"
-import mickey from "../assets/images/Michelangelo_TMNT_2012.webp"
+// import leo from "../assets/images/Leonardo_2012.webp"
+// import rapha from "../assets/images/raphael.png"
+// import donnie from "../assets/images/donatello.png"
+// import mickey from "../assets/images/Michelangelo_TMNT_2012.webp"
 
 
 export default function SuccesfulRegistry() {
@@ -79,10 +79,10 @@ export default function SuccesfulRegistry() {
             Ok
         </motion.button>
       </div>
-       <motion.img src={leo} alt="" className="absolute bottom-4 left-4 w-[180px] md:w-[300px]" initial={{ opacity: 0, x: -80 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }} />
+       {/* <motion.img src={leo} alt="" className="absolute bottom-4 left-4 w-[180px] md:w-[300px]" initial={{ opacity: 0, x: -80 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }} />
        <motion.img src={rapha} alt="" className="absolute bottom-4 right-0 w-[120px] md:w-[230px]" initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}/>
        <motion.img src={donnie} alt="" className="absolute top-4 left-4 w-[180px] md:w-[260px]" initial={{ opacity: 0, x: -80 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}/>
-       <motion.img src={mickey} alt="" className="absolute top-4 right-0 w-[120px] md:w-[200px]" initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}/>
+       <motion.img src={mickey} alt="" className="absolute top-4 right-0 w-[120px] md:w-[200px]" initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}/> */}
 
        
     </motion.div>

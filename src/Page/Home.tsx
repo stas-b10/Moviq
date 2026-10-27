@@ -1,7 +1,33 @@
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabase";
+
 export default function Home() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout error:", error);
+      return;
+    }
+
+    navigate("/", { replace: true });
+  };
+
   return (
     <div>
-      <p className="text-3xl font-bold text-center mt-10">Welcome to the Home Page</p>
+    <section className="relative h-screen overflow-hidden bg-white dark:bg-[#1A1919]">
+      
+      <p className="mt-30 text-center text-3xl font-bold">
+        Welcome to the Home Page
+      </p>
+      <div className="mt-6 flex justify-center">
+        <button type="button" onClick={handleLogout} className="cursor-pointer rounded-lg bg-[#228EE5] px-8 py-3 font-semibold text-white transition-transform duration-300 hover:scale-[1.02]">
+          Log out
+        </button>
+      </div>
+    </section>
     </div>
-  )
+  );
 }

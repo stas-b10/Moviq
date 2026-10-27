@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { IoCheckmarkCircle } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 
 interface AlertProps {
@@ -7,6 +8,7 @@ interface AlertProps {
 }
 
 export default function ResetAlert({ onClose }: AlertProps) {
+  const navigate = useNavigate();
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
       <motion.div initial={{ opacity: 0, scale: 0.92, y: 15 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="relative w-full max-w-[460px] overflow-hidden rounded-[16px] border border-white/10 bg-gradient-to-tr from-[#9747FF] from-0% via-[#3D246A] via-0% to-[#030A1B] to-40% p-7 shadow-2xl md:p-9">
@@ -19,7 +21,10 @@ export default function ResetAlert({ onClose }: AlertProps) {
             <div className="flex justify-end mt-6">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  navigate("/auth");
+                }}
                 className="px-12 rounded-lg bg-[#228EE5] py-2.5 font-semibold text-white transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Close

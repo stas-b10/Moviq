@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
   font-family: "BebasNeue-Regular";
   src: url("./assets/fonts/BebasNeue-Regular.ttf");
@@ -86,4 +88,23 @@
 
 .space-grotesk-semi-bold {
   font-family: "SpaceGrotesk-SemiBold", sans-serif;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    #228ee5 0%,
+    rgba(34, 142, 229, 0.18) 28%,
+    rgba(34, 142, 229, 0.14) 74%,
+    #228ee5 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
