@@ -1,20 +1,78 @@
 import { useEffect,useState } from "react"
 import { FaMoon } from "react-icons/fa6";
 import { LuSun } from "react-icons/lu";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import light_logo from "../assets/images/light_logo.png"
 import dark_logo from "../assets/images/dark_logo.png"
 import { IoNotifications, IoPerson } from "react-icons/io5";
 import { MdOutlineSearch } from "react-icons/md";
+import Notifications from "./Notifications";
+import { supabase } from "../utils/supabase";
 
 export default function Navbar() {
   const [darkMode,setDarkMode] = useState(true);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
+
+  useEffect(() => {
+  let active = true;
+  let channel: ReturnType<typeof supabase.channel> | undefined;
+
+  const loadUnreadCount = async () => {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (!active || userError || !user) {
+      if (active) setUnreadCount(0);
+      return;
+    }
+
+    const fetchCount = async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", user.id)
+        .eq("is_read", false);
+
+      if (!error && active) {
+        setUnreadCount(count ?? 0);
+      }
+    };
+    await fetchCount();
+    if (!active) return;
+    channel = supabase
+      .channel(`navbar-notifications-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        () => {
+          void fetchCount();
+        },
+      )
+      .subscribe();
+  };
+
+  void loadUnreadCount();
+
+  return () => {
+    active = false;
+    if (channel) void supabase.removeChannel(channel);
+  };
+}, []);
 
     
   return (
@@ -36,10 +94,13 @@ export default function Navbar() {
       <button  className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
         <MdOutlineSearch className="absolute text-[24px]"/>
       </button>
-      <button  className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+      <button onClick={() => setNotificationOpen((prev) => !prev)} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
         <IoNotifications className="absolute text-[24px]"/>
+        {unreadCount > 0 && (
+          <span className="absolute right-1 bottom-1 h-2.5 w-2.5 rounded-full border-2 border-[#030A1B] bg-red-500" />
+        )}
       </button>
-      <button  className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+      <button onClick={() => navigate("/profile")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
         <IoPerson className="absolute text-[24px]" />
       </button>
       <button onClick={() => setDarkMode((prev) => !prev)} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
@@ -47,6 +108,7 @@ export default function Navbar() {
       </button>
       </div>
       </nav>
+      <Notifications  isOpen={notificationOpen} onClose={() => setNotificationOpen(false)} onUnreadCountChange={setUnreadCount}/>
     </header>
     </>
   )

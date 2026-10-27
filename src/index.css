@@ -108,3 +108,53 @@
   mask-composite: exclude;
   pointer-events: none;
 }
+
+
+@keyframes notification-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.notifications-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c4cbd5 transparent;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.notifications-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifications-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 8px;
+}
+
+.notifications-scrollbar::-webkit-scrollbar-thumb {
+  background: #c4cbd5;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 200ms ease;
+}
+
+.notifications-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #228ee5;
+  background-clip: padding-box;
+}
+
+.dark .notifications-scrollbar {
+  scrollbar-color: #465268 transparent;
+}
+
+.dark .notifications-scrollbar::-webkit-scrollbar-thumb {
+  background: #465268;
+  background-clip: padding-box;
+}
+
+.dark .notifications-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #228ee5;
+  background-clip: padding-box;
+}

@@ -50,6 +50,17 @@ export default function Auth() {
         return;
       }
 
+      const { error: notificationError } = await supabase.rpc(
+        "notify_user_signin",
+      );
+
+      if (notificationError) {
+        console.error(
+          "Could not create sign-in notification:",
+          notificationError.message,
+        );
+      }
+
       navigate("/succesful_logged");
     } catch {
       setError("An error occurred during login. Please try again.");
@@ -87,7 +98,7 @@ const handleGoogleLogin = async (action: "login" | "register") => {
 };
       
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-[#9747FF] from-0% via-[#3D246A] via-0% to-[#030A1B] to-40% ">
+    <div className="min-h-screen bg-gradient-to-tr from-[#9747FF] from-0% via-[#3D246A] via-0% to-[#030A1B] to-40%">
       <div className="flex min-h-screen">
        <motion.div className="flex w-[32%] flex-col" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>
         <motion.h1 className="space-grotesk-medium pl-[190px] pt-[100px] text-[80px] font-bold text-white" initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: "easeInOut" }}>

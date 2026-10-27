@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <div>
-    <section className="relative h-screen overflow-hidden bg-white dark:bg-[#1A1919]">
+    <section className="relative h-screen overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
       
       <p className="mt-30 text-center text-3xl font-bold">
         Welcome to the Home Page

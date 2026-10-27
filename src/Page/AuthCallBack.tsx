@@ -16,19 +16,23 @@ export default function AuthCallback() {
         error,
       } = await supabase.auth.getSession();
 
+      if (isHandled) return;
+
       if (error) {
         console.error("Authentication error:", error);
         return;
       }
 
       if (!session?.user) {
-        console.log("No session yet, waiting...");
         return;
       }
 
       isHandled = true;
 
       const user = session.user;
+
+      const googleAction = sessionStorage.getItem("google_auth_action");
+      sessionStorage.removeItem("google_auth_action");
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -41,29 +45,34 @@ export default function AuthCallback() {
         return;
       }
 
-      console.log("Google user:", user);
-      console.log("Profile:", profile);
-
       if (!profile) {
-        sessionStorage.removeItem("google_auth_action");
         navigate("/profile_set", { replace: true });
         return;
       }
 
-      sessionStorage.removeItem("google_auth_action");
+      if (googleAction === "login") {
+        const { error: notificationError } = await supabase.rpc(
+          "notify_user_signin",
+        );
+
+        if (notificationError) {
+          console.error(
+            "Could not create Google sign-in notification:",
+            notificationError.message,
+          );
+        }
+      }
+
       navigate("/succesful_logged", { replace: true });
     };
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
-
-      if (session?.user) {
-        handleSession();
-      }
+    } = supabase.auth.onAuthStateChange(() => {
+      void handleSession();
     });
-    handleSession();
+
+    void handleSession();
 
     return () => {
       subscription.unsubscribe();
@@ -72,9 +81,7 @@ export default function AuthCallback() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#030A1B]">
-      <p className="text-lg text-white">
-        Signing you in...
-      </p>
+      <p className="text-lg text-white">Signing you in...</p>
     </div>
   );
 }
