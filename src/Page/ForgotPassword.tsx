@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import ResetAlert from "../components/ResetAlert";
-import spider_man from "../assets/images/spider_man.webp"
 
 export default function ForgotPassword() {
   const [username, setUsername] = useState("");

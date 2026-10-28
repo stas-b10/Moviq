@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "../utils/supabase";
-import patrick from "../assets/images/Patrick_Star_character.png";
-import spongebob from "../assets/images/spongebob.png";
+// import patrick from "../assets/images/Patrick_Star_character.png";
+// import spongebob from "../assets/images/spongebob.png";
 
 
 export default function SuccesfulRegistry() {
@@ -73,8 +73,8 @@ export default function SuccesfulRegistry() {
           Your account has been successfully created.
         </motion.h1>
       </div>
-       <img src={patrick} alt="" className="absolute bottom-10 left-10 w-[180px] md:w-[260px]"/>
-       <img src={spongebob} alt="" className="absolute bottom-0 right-0 w-[220px] md:w-[330px]"/>
+       {/* <img src={patrick} alt="" className="absolute bottom-10 left-10 w-[180px] md:w-[260px]"/>
+       <img src={spongebob} alt="" className="absolute bottom-0 right-0 w-[220px] md:w-[330px]"/> */}
     </motion.div>
   )
 }

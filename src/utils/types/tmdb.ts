@@ -73,3 +73,37 @@ export async function searchTitles(
 
   return data.results;
 }
+
+
+export interface TMDBTrendingTitle extends TMDBTitle {
+  media_type: TMDBMediaType;
+}
+
+interface TMDBTrendingResponse {
+  results: TMDBTrendingTitle[];
+}
+
+export async function getTrendingTitles(): Promise<TMDBTrendingTitle[]> {
+  const { data, error } = await supabase.functions.invoke<TMDBTrendingResponse>(
+    "tmdb-proxy",
+    {
+      body: {
+        type: "all",
+        action: "trending",
+        page: 1,
+      },
+    },
+  );
+
+  if (error) {
+    throw new Error(`Unable to load trending titles: ${error.message}`);
+  }
+
+  if (!data || !Array.isArray(data.results)) {
+    throw new Error("TMDB returned an invalid trending response.");
+  }
+
+  return data.results.filter(
+    (item) => item.media_type === "movie" || item.media_type === "tv",
+  );
+}
