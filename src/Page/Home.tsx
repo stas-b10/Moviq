@@ -44,7 +44,6 @@ export default function Home() {
 
         if (!active) return;
 
-        // Trending titles first, followed by popular movies and TV shows.
         const candidates = Array.from(
           new Map(
             [
@@ -70,8 +69,7 @@ export default function Home() {
         const eligibleTitles: TMDBTrendingTitle[] = [];
         const enrichmentMap: Record<string, TMDBEnrichment> = {};
 
-        // Process candidates in groups. The hero can render after the
-        // first group, while the remaining candidates load in the background.
+
         const batchSize = 10;
 
         for (let i = 0; i < candidates.length; i += batchSize) {
@@ -124,8 +122,6 @@ export default function Home() {
             enrichmentMap[key] = result.details;
           }
 
-          // Update the interface after each batch instead of waiting
-          // for every candidate to finish.
           setTrending([...eligibleTitles]);
           setEnrichments({ ...enrichmentMap });
 
@@ -216,7 +212,7 @@ useEffect(() => {
             <div key={backdropUrl} className="absolute inset-0 animate-[backdropFade_1.2s_ease-in-out]" style={{ backgroundImage: `url("${backdropUrl}")`, backgroundSize: "cover", backgroundPosition: "",}}/>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#EBFAFF]/95 via-[#EBFAFF]/70 to-[#EBFAFF]/0 dark:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#EBFAFF]/95 via-[#EBFAFF]/30 to-[#EBFAFF]/0 dark:hidden" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#EBFAFF] via-transparent to-transparent dark:hidden" />
 
         <div className="absolute inset-0 hidden bg-[#030A1B]/15 dark:block" />
