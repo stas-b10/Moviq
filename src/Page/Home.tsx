@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getTrendingTitles,
@@ -7,143 +7,195 @@ import {
   type TMDBTrendingTitle,
   type TMDBEnrichment,
 } from "../utils/types/tmdb";
-import { FaArrowRight } from "react-icons/fa6";
+import {FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import MoviesCard from "../components/MoviesCard";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
+
+import "swiper/css";
 
 export default function Home() {
   const navigate = useNavigate();
 
   const [trending, setTrending] = useState<TMDBTrendingTitle[]>([]);
-  const [enrichments, setEnrichments] = useState<
-    Record<string, TMDBEnrichment>
-  >({});
+  const [enrichments, setEnrichments] = useState< Record<string, TMDBEnrichment>>({});
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const trendsSwiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    async function fetchHomeTitles() {
-      setLoading(true);
-      setError(null);
-      setTrending([]);
-      setEnrichments({});
+  async function fetchHomeTitles() {
+  setLoading(true);
+  setError(null);
+  setTrending([]);
+  setEnrichments({});
 
-      try {
-        const [trendingTitles, moviePages, tvPages] = await Promise.all([
-          getTrendingTitles(),
-          Promise.all([
-            getPopularTitles("movie", 1),
-            getPopularTitles("movie", 2),
-          ]),
-          Promise.all([
-            getPopularTitles("tv", 1),
-            getPopularTitles("tv", 2),
-          ]),
-        ]);
+  try {
+    const TARGET_COUNT = 50;
+    const MAX_PAGES_PER_TYPE = 5;
+    const BATCH_SIZE = 10;
+
+    const [trendingTitles, firstMoviePage, firstTvPage] =
+      await Promise.all([
+        getTrendingTitles(),
+        getPopularTitles("movie", 1),
+        getPopularTitles("tv", 1),
+      ]);
+
+    if (!active) return;
+
+    const candidates = new Map<string, TMDBTrendingTitle>();
+
+    const addCandidates = (titles: TMDBTrendingTitle[]) => {
+      for (const title of titles) {
+        if (!title.poster_path || !title.backdrop_path) continue;
+
+        const key = `${title.media_type}-${title.id}`;
+
+        if (!candidates.has(key)) {
+          candidates.set(key, title);
+        }
+      }
+    };
+
+    addCandidates(trendingTitles);
+    addCandidates(firstMoviePage);
+    addCandidates(firstTvPage);
+
+    let moviePage = 1;
+    let tvPage = 1;
+
+    const eligibleTitles: TMDBTrendingTitle[] = [];
+    const enrichmentMap: Record<string, TMDBEnrichment> = {};
+    const processedIds = new Set<string>();
+
+    while (
+      active &&
+      eligibleTitles.length < TARGET_COUNT &&
+      (moviePage < MAX_PAGES_PER_TYPE ||
+        tvPage < MAX_PAGES_PER_TYPE)
+    ) {
+      const remainingCandidates = [...candidates.values()].filter(
+        (title) =>
+          !processedIds.has(`${title.media_type}-${title.id}`)
+      );
+
+      if (remainingCandidates.length < BATCH_SIZE) {
+        const nextPages: Promise<TMDBTrendingTitle[]>[] = [];
+
+        if (moviePage < MAX_PAGES_PER_TYPE) {
+          moviePage++;
+          nextPages.push(getPopularTitles("movie", moviePage));
+        }
+
+        if (tvPage < MAX_PAGES_PER_TYPE) {
+          tvPage++;
+          nextPages.push(getPopularTitles("tv", tvPage));
+        }
+
+        const fetchedPages = await Promise.all(nextPages);
 
         if (!active) return;
 
-        const candidates = Array.from(
-          new Map(
-            [
-              ...trendingTitles,
-              ...moviePages.flat(),
-              ...tvPages.flat(),
-            ]
-              .filter(
-                (title) => title.poster_path && title.backdrop_path
-              )
-              .map((title) => [
-                `${title.media_type}-${title.id}`,
-                title,
-              ])
-          ).values()
-        ).slice(0, 40);
-
-        if (candidates.length === 0) {
-          setLoading(false);
-          return;
+        for (const page of fetchedPages) {
+          addCandidates(page);
         }
+      }
 
-        const eligibleTitles: TMDBTrendingTitle[] = [];
-        const enrichmentMap: Record<string, TMDBEnrichment> = {};
+      const batch = [...candidates.values()]
+        .filter(
+          (title) =>
+            !processedIds.has(`${title.media_type}-${title.id}`)
+        )
+        .slice(0, BATCH_SIZE);
 
+      if (batch.length === 0) break;
 
-        const batchSize = 10;
+      const results = await Promise.all(
+        batch.map(async (title) => {
+          const id = `${title.media_type}-${title.id}`;
 
-        for (let i = 0; i < candidates.length; i += batchSize) {
-          if (!active) return;
+          processedIds.add(id);
 
-          const batch = candidates.slice(i, i + batchSize);
+          try {
+            const details = await getCachedTitleEnrichment(
+              title.media_type,
+              title.id,
+              "MD"
+            );
 
-          const results = await Promise.all(
-            batch.map(async (title) => {
-              try {
-                const details = await getCachedTitleEnrichment(
-                  title.media_type,
-                  title.id,
-                  "MD"
-                );
+            const rating =
+              details.imdbRating === null
+                ? NaN
+                : Number(details.imdbRating);
 
-                const rating =
-                  details.imdbRating === null
-                    ? NaN
-                    : Number(details.imdbRating);
+            if (
+              !Number.isFinite(rating) ||
+              rating <= 6.7 ||
+              rating > 10
+            ) {
+              return null;
+            }
 
-                if (
-                  !Number.isFinite(rating) ||
-                  rating <= 6.7 ||
-                  rating > 10
-                ) {
-                  return null;
-                }
+            return { title, details };
+          } catch (err) {
+            console.warn(
+              `Could not enrich ${title.title ?? title.name ?? title.id}`,
+              err
+            );
 
-                return { title, details };
-              } catch (err) {
-                console.warn(
-                  `Could not enrich ${title.title ?? title.name ?? title.id}`,
-                  err
-                );
-                return null;
-              }
-            })
-          );
-
-          if (!active) return;
-
-          for (const result of results) {
-            if (!result) continue;
-
-            const key =
-              `${result.title.media_type}-${result.title.id}`;
-
-            eligibleTitles.push(result.title);
-            enrichmentMap[key] = result.details;
+            return null;
           }
+        })
+      );
 
-          setTrending([...eligibleTitles]);
-          setEnrichments({ ...enrichmentMap });
+      if (!active) return;
 
-          if (i === 0) {
-            setFeaturedIndex(0);
-            setLoading(false);
-          }
+      for (const result of results) {
+        if (!result) continue;
+
+        const id = `${result.title.media_type}-${result.title.id}`;
+
+        if (eligibleTitles.some(
+          (title) => `${title.media_type}-${title.id}` === id
+        )) {
+          continue;
         }
 
-        if (active && eligibleTitles.length === 0) {
-          setError(
-            "No popular titles with available IMDb ratings were found."
-          );
-        }
-      } catch (err) {
-        if (!active) return;
+        eligibleTitles.push(result.title);
+        enrichmentMap[id] = result.details;
 
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load popular titles."
-        );
+        if (eligibleTitles.length >= TARGET_COUNT) break;
+      }
+
+      setTrending([...eligibleTitles]);
+      setEnrichments({ ...enrichmentMap });
+
+      if (eligibleTitles.length > 0) {
+        setLoading(false);
+      }
+    }
+
+    if (!active) return;
+
+    if (eligibleTitles.length === 0) {
+      setError(
+        "No popular titles with available IMDb ratings were found."
+      );
+    }
+
+    setTrending(eligibleTitles.slice(0, TARGET_COUNT));
+    setEnrichments(enrichmentMap);
+    setFeaturedIndex(0);
+  } catch (err) {
+    if (!active) return;
+
+    setError(
+      err instanceof Error ? err.message : "Failed to load popular titles."
+    );
       } finally {
         if (active) setLoading(false);
       }
@@ -169,7 +221,17 @@ useEffect(() => {
 
 
 
-  const featured = trending[featuredIndex] ?? null;
+  const titlesWithProviders = trending.filter((title) => {
+  const key = `${title.media_type}-${title.id}`;
+  const providers = enrichments[key]?.providers;
+
+  return Array.isArray(providers) && providers.length > 0;
+});
+
+const featured =
+  titlesWithProviders.length > 0
+    ? titlesWithProviders[featuredIndex % titlesWithProviders.length]
+    : null;
 
   const key = featured
     ? `${featured.media_type}-${featured.id}`
@@ -187,17 +249,18 @@ useEffect(() => {
   const getYear = (title: TMDBTrendingTitle) =>
     (title.release_date ?? title.first_air_date ?? "").slice(0, 4);
 
+
   const visibleTitles =
-  trending.length > 0
+  titlesWithProviders.length > 0
     ? Array.from(
-        { length: Math.min(4, trending.length) },
+        { length: Math.min(4, titlesWithProviders.length) },
         (_, index) => {
           const titleIndex =
-            (featuredIndex - 1 + index + trending.length) %
-            trending.length;
+            (featuredIndex - 1 + index + titlesWithProviders.length) %
+            titlesWithProviders.length;
 
           return {
-            title: trending[titleIndex],
+            title: titlesWithProviders[titleIndex],
             index: titleIndex,
           };
         }
@@ -374,6 +437,77 @@ useEffect(() => {
                   )}
               </button>
             )))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px]  lg:gap-8 lg:px-10 lg:pb-4 lg:pt-4">
+            <h2 className="space-grotesk-bold text-[34px] ">
+              Trends
+            </h2>
+             <div className="relative">
+              <button
+              type="button"
+              onClick={() => {
+                const swiper = trendsSwiperRef.current;
+                if (!swiper) return;
+
+                swiper.slideTo(Math.max(swiper.activeIndex - 5, 0));
+              }}
+              aria-label="Previous titles"
+              className="absolute -left-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            >
+              <FaArrowLeft />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const swiper = trendsSwiperRef.current;
+                if (!swiper) return;
+
+                swiper.slideTo(
+                  Math.min(swiper.activeIndex + 5, swiper.slides.length - 1)
+                );
+              }}
+              aria-label="Next titles"
+              className="absolute -right-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            >
+              <FaArrowRight />
+            </button>
+             <Swiper
+              onSwiper={(swiper) => {
+                trendsSwiperRef.current = swiper;
+              }}
+              slidesPerView={2}
+              slidesPerGroup={5}
+              spaceBetween={16}
+              speed={400}
+              watchOverflow
+              breakpoints={{
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 16,
+                },
+                768: {
+                  slidesPerView: 4,
+                  spaceBetween: 20,
+                },
+                1024: {
+                  slidesPerView: 6,
+                  spaceBetween: 16,
+                },
+              }}
+            >
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {trending.slice(0, 50).map((title) => (
+                <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
+                  <MoviesCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                </SwiperSlide>
+              ))}
+            </div>
+            </Swiper>
           </div>
         </div>
       </section>
