@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getTrendingTitles,
@@ -14,11 +14,6 @@ import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import TrendingCard from "../components/TrendingCard";
 import MoviesCard from "../components/MoviesCard";
-import MovieFilters from "../components/MovieFilters";
-import {
-  defaultFilters,
-  type MovieFilterValues,
-} from "../utils/types/movie_filters";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -31,9 +26,8 @@ export default function Home() {
   const trendsSwiperRef = useRef<SwiperType | null>(null);
   const moviesSwiperRef = useRef<SwiperType | null>(null);
   const [popularMovies, setPopularMovies] = useState<TMDBTrendingTitle[]>([]);
-  const currentYear = new Date().getFullYear();
 
-  const [movieFilters, setMovieFilters] = useState<MovieFilterValues>({ ...defaultFilters });
+
 
   useEffect(() => {
     let active = true;
@@ -301,75 +295,6 @@ const featured =
       )
     : [];
 
-  const filteredMovies = useMemo(() => {
-  const filtered = popularMovies.filter((movie) => {
-    const rating = movie.imdbRating;
-
-    const votes = Number(
-      movie.imdbVotes?.replace(/,/g, "") ?? 0
-    );
-
-    if (
-      rating === undefined ||
-      rating < movieFilters.minRating ||
-      rating > movieFilters.maxRating
-    ) {
-      return false;
-    }
-
-    if (votes < movieFilters.minVotes) {
-      return false;
-    }
-
-    const releaseDate = movie.release_date;
-
-    if (!releaseDate) {
-      return false;
-    }
-
-    const year = Number(releaseDate.slice(0, 4));
-
-    if (
-      !Number.isFinite(year) ||
-      year < movieFilters.startYear ||
-      year > movieFilters.endYear
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
-  switch (movieFilters.sortBy) {
-    case "rating":
-      return filtered.sort(
-        (a, b) => (b.imdbRating ?? 0) - (a.imdbRating ?? 0)
-      );
-
-    case "votes":
-      return filtered.sort(
-        (a, b) =>
-          Number(b.imdbVotes?.replace(/,/g, "") ?? 0) -
-          Number(a.imdbVotes?.replace(/,/g, "") ?? 0)
-      );
-
-    case "newest":
-      return filtered.sort(
-        (a, b) =>
-          (b.release_date ?? "").localeCompare(a.release_date ?? "")
-      );
-
-    case "oldest":
-      return filtered.sort(
-        (a, b) =>
-          (a.release_date ?? "").localeCompare(b.release_date ?? "")
-      );
-
-    case "popular":
-    default:
-      return filtered;
-  }
-}, [popularMovies, movieFilters]);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#EBFAFF] text-slate-950 dark:bg-[#030A1B] dark:text-white">

@@ -12,6 +12,7 @@ export interface TMDBTitle {
   vote_average: number;
   release_date?: string;
   first_air_date?: string;
+  media_type?: TMDBMediaType;
 }
 
 export interface TMDBTrendingTitle extends TMDBTitle {
@@ -44,6 +45,18 @@ interface TMDBListResponse {
   results: TMDBTitle[];
 }
 
+interface TMDBTrendingResponse {
+  results: (TMDBTitle & {
+    media_type: TMDBMediaType | "person";
+  })[];
+}
+
+const POPULAR_MOVIES_CACHE_KEY = "moviq:movies:v1";
+const POPULAR_MOVIES_CACHE_TTL = 6 * 60 * 60 * 1000;
+
+let popularMoviesRequest: Promise<TMDBTrendingTitle[]> | null = null;
+
+
 async function invokeTMDB<T>(
   body: Record<string, unknown>
 ): Promise<T> {
@@ -68,21 +81,20 @@ async function invokeTMDB<T>(
 }
 
 export async function getTrendingTitles(): Promise<TMDBTrendingTitle[]> {
-  const data = await invokeTMDB<TMDBListResponse>({
+  const data = await invokeTMDB<TMDBTrendingResponse>({
     type: "all",
     action: "trending",
     page: 1,
   });
 
-  return (data.results ?? [])
+  return data.results
     .filter(
-      (title) =>
-        title.media_type === "movie" || title.media_type === "tv"
-    )
-    .map((title) => ({
-      ...title,
-      media_type: (title as TMDBTrendingTitle).media_type,
-    })) as TMDBTrendingTitle[];
+      (title): title is TMDBTitle & {
+        media_type: TMDBMediaType;
+      } =>
+        title.media_type === "movie" ||
+        title.media_type === "tv"
+    );
 }
 
 export async function getPopularTitles(
@@ -163,44 +175,111 @@ export async function getCachedTitleEnrichment(
 }
 
 
-export async function getPopularMovies(): Promise<TMDBTrendingTitle[]> {
-  const MAX_PAGES = 20;
 
-  const sources = [
-    "popular",
-    "top_rated",
-    "now_playing",
-    "upcoming",
-  ] as const;
+export async function getPopularMovies(
+  onUpdate?: (movies: TMDBTrendingTitle[]) => void
+): Promise<TMDBTrendingTitle[]> {
+  try {
+    const cached = localStorage.getItem(POPULAR_MOVIES_CACHE_KEY);
 
-  const results = await Promise.all(
-    sources.map(async (action) => {
-      const pages = await Promise.all(
-        Array.from({ length: MAX_PAGES }, (_, index) =>
-          invokeTMDB<TMDBListResponse>({
-            type: "movie",
-            action,
-            page: index + 1,
-          })
-        )
-      );
+    if (cached) {
+      const entry = JSON.parse(cached) as {
+        timestamp: number;
+        movies: TMDBTrendingTitle[];
+      };
 
-      return pages.flatMap((page) => page.results ?? []);
-    })
-  );
-
-  const uniqueMovies = new Map<number, TMDBTrendingTitle>();
-
-  for (const movies of results) {
-    for (const movie of movies) {
-      if (!uniqueMovies.has(movie.id)) {
-        uniqueMovies.set(movie.id, {
-          ...movie,
-          media_type: "movie",
-        });
+      if (
+        Date.now() - entry.timestamp < POPULAR_MOVIES_CACHE_TTL &&
+        Array.isArray(entry.movies)
+      ) {
+        onUpdate?.(entry.movies);
+        return entry.movies;
       }
     }
+  } catch {
+    // Ignore invalid or unavailable cache.
   }
 
-  return Array.from(uniqueMovies.values()).slice(0, 50);
+  if (popularMoviesRequest) {
+    const movies = await popularMoviesRequest;
+    onUpdate?.(movies);
+    return movies;
+  }
+
+  popularMoviesRequest = (async () => {
+    const MAX_MOVIES = 50;
+    const MAX_PAGES_PER_SOURCE = 2;
+
+    const sources = [
+      "popular",
+      "top_rated",
+      "now_playing",
+      "upcoming",
+    ] as const;
+
+    const uniqueMovies = new Map<number, TMDBTrendingTitle>();
+
+    for (
+      let page = 1;
+      page <= MAX_PAGES_PER_SOURCE;
+      page++
+    ) {
+      for (const action of sources) {
+        if (uniqueMovies.size >= MAX_MOVIES) break;
+
+        try {
+          const data = await invokeTMDB<TMDBListResponse>({
+            type: "movie",
+            action,
+            page,
+          });
+
+          for (const movie of data.results ?? []) {
+            if (!uniqueMovies.has(movie.id)) {
+              uniqueMovies.set(movie.id, {
+                ...movie,
+                media_type: "movie",
+              });
+            }
+          }
+
+          onUpdate?.(
+            Array.from(uniqueMovies.values()).slice(0, MAX_MOVIES)
+          );
+        } catch (error) {
+          console.error(
+            `Failed to load ${action}, page ${page}:`,
+            error
+          );
+        }
+      }
+
+      if (uniqueMovies.size >= MAX_MOVIES) break;
+    }
+
+    const movies = Array.from(uniqueMovies.values()).slice(
+      0,
+      MAX_MOVIES
+    );
+
+    try {
+      localStorage.setItem(
+        POPULAR_MOVIES_CACHE_KEY,
+        JSON.stringify({
+          timestamp: Date.now(),
+          movies,
+        })
+      );
+    } catch {
+      // 
+    }
+
+    return movies;
+  })();
+
+  try {
+    return await popularMoviesRequest;
+  } finally {
+    popularMoviesRequest = null;
+  }
 }
