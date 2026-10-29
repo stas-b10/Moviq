@@ -1,4 +1,3 @@
-
 import { supabase } from "../supabase";
 
 export type TMDBMediaType = "movie" | "tv";
@@ -15,95 +14,148 @@ export interface TMDBTitle {
   first_air_date?: string;
 }
 
-interface TMDBResponse {
-  page: number;
-  results: TMDBTitle[];
-  total_pages: number;
-  total_results: number;
-}
-
-export async function getPopularTitles(
-  type: TMDBMediaType,
-): Promise<TMDBTitle[]> {
-  const { data, error } = await supabase.functions.invoke<TMDBResponse>(
-    "tmdb-proxy",
-    {
-      body: {
-        type,
-        action: "popular",
-        page: 1,
-      },
-    },
-  );
-
-  if (error) {
-    throw new Error(`Unable to load titles: ${error.message}`);
-  }
-
-  if (!data || !Array.isArray(data.results)) {
-    throw new Error("TMDB returned an invalid response.");
-  }
-
-  return data.results;
-}
-
-export async function searchTitles(
-  type: TMDBMediaType,
-  query: string,
-): Promise<TMDBTitle[]> {
-  const { data, error } = await supabase.functions.invoke<TMDBResponse>(
-    "tmdb-proxy",
-    {
-      body: {
-        type,
-        action: "search",
-        query,
-        page: 1,
-      },
-    },
-  );
-
-  if (error) {
-    throw new Error(`Search failed: ${error.message}`);
-  }
-
-  if (!data || !Array.isArray(data.results)) {
-    throw new Error("TMDB returned an invalid response.");
-  }
-
-  return data.results;
-}
-
-
 export interface TMDBTrendingTitle extends TMDBTitle {
   media_type: TMDBMediaType;
 }
 
-interface TMDBTrendingResponse {
-  results: TMDBTrendingTitle[];
+export interface StreamingProvider {
+  id: number;
+  name: string;
+  logoPath: string | null;
+  logoUrl: string | null;
+  categories?: string[];
 }
 
-export async function getTrendingTitles(): Promise<TMDBTrendingTitle[]> {
-  const { data, error } = await supabase.functions.invoke<TMDBTrendingResponse>(
+export interface TMDBEnrichment {
+  id: number;
+  type: TMDBMediaType;
+  region: string;
+  imdbId: string | null;
+  imdbRating: string | null;
+  imdbVotes: string | null;
+  providers: StreamingProvider[];
+  providerLink: string | null;
+  providerAttribution: string | null;
+}
+
+interface TMDBListResponse {
+  results: TMDBTitle[];
+}
+
+async function invokeTMDB<T>(
+  body: Record<string, unknown>
+): Promise<T> {
+  const { data, error } = await supabase.functions.invoke(
     "tmdb-proxy",
-    {
-      body: {
-        type: "all",
-        action: "trending",
-        page: 1,
-      },
-    },
+    { body }
   );
 
   if (error) {
-    throw new Error(`Unable to load trending titles: ${error.message}`);
+    throw new Error(error.message || "TMDB request failed.");
   }
 
-  if (!data || !Array.isArray(data.results)) {
-    throw new Error("TMDB returned an invalid trending response.");
+  if (!data) {
+    throw new Error("The TMDB proxy returned no data.");
   }
 
-  return data.results.filter(
-    (item) => item.media_type === "movie" || item.media_type === "tv",
-  );
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  return data as T;
+}
+
+export async function getTrendingTitles(): Promise<TMDBTrendingTitle[]> {
+  const data = await invokeTMDB<TMDBListResponse>({
+    type: "all",
+    action: "trending",
+    page: 1,
+  });
+
+  return (data.results ?? [])
+    .filter(
+      (title) =>
+        title.media_type === "movie" || title.media_type === "tv"
+    )
+    .map((title) => ({
+      ...title,
+      media_type: (title as TMDBTrendingTitle).media_type,
+    })) as TMDBTrendingTitle[];
+}
+
+export async function getPopularTitles(
+  type: TMDBMediaType,
+  page = 1
+): Promise<TMDBTrendingTitle[]> {
+  const data = await invokeTMDB<TMDBListResponse>({
+    type,
+    action: "popular",
+    page,
+  });
+
+  return (data.results ?? []).map((title) => ({
+    ...title,
+    media_type: type,
+  }));
+}
+
+export async function getTitleEnrichment(
+  type: TMDBMediaType,
+  id: number,
+  region = "MD"
+): Promise<TMDBEnrichment> {
+  return invokeTMDB<TMDBEnrichment>({
+    type,
+    action: "enrich",
+    id,
+    region,
+  });
+}
+
+const ENRICHMENT_CACHE_PREFIX = "moviq:enrichment:";
+const ENRICHMENT_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+export async function getCachedTitleEnrichment(
+  type: TMDBMediaType,
+  id: number,
+  region = "MD"
+): Promise<TMDBEnrichment> {
+  const key = `${ENRICHMENT_CACHE_PREFIX}${region}:${type}:${id}`;
+
+  try {
+    const cached = localStorage.getItem(key);
+
+    if (cached) {
+      const entry = JSON.parse(cached) as {
+        timestamp: number;
+        data: TMDBEnrichment;
+      };
+
+      if (
+        Date.now() - entry.timestamp < ENRICHMENT_CACHE_TTL &&
+        entry.data &&
+        Array.isArray(entry.data.providers)
+      ) {
+        return entry.data;
+      }
+    }
+  } catch {
+    //
+  }
+
+  const data = await getTitleEnrichment(type, id, region);
+
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        timestamp: Date.now(),
+        data,
+      })
+    );
+  } catch {
+    // 
+  }
+
+  return data;
 }
