@@ -1,17 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaStar, FaCheck } from "react-icons/fa6";
-import type { TMDBTrendingTitle } from "../utils/types/tmdb";
-
-interface MoviesCardProps {
-  title: TMDBTrendingTitle;
-  rating?: string | number | null;
-  isFavorite: boolean;
-  onToggleFavorite: (title: TMDBTrendingTitle) => void;
-}
+import { FaPlus, FaCheck } from "react-icons/fa6";
+import type { MoviesCardProps } from "../utils/types/movies_cardprops";
 
 export default function MoviesCard({
   title,
-  rating,
   isFavorite,
   onToggleFavorite,
 }: MoviesCardProps) {
@@ -19,23 +11,9 @@ export default function MoviesCard({
 
   const name = title.title ?? title.name ?? "Untitled";
 
-  const year = (
-    title.release_date ??
-    title.first_air_date ??
-    ""
-  ).slice(0, 4);
 
   const posterUrl = title.poster_path
     ? `https://image.tmdb.org/t/p/w500${title.poster_path}`
-    : null;
-
-  const parsedRating =
-    rating !== null && rating !== undefined && rating !== ""
-      ? Number(rating)
-      : title.vote_average;
-
-  const displayRating = Number.isFinite(parsedRating)
-    ? parsedRating.toFixed(1)
     : null;
 
   const openDetails = () => {
@@ -72,9 +50,6 @@ export default function MoviesCard({
             <FaPlus className="text-sm" />
           )}
         </button>
-        <span className="absolute right-3 top-3 rounded-3xl border border-white/20 bg-black/50 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md ">
-          {title.media_type === "tv" ? "TV Show" : "Movie"}
-        </span>
       </div>
       <div className="px-0.5 pb-1 pt-3 text-center justify-center">
         <h3 title={name} className="space-grotesk-bold text-[14px] leading-5 text-black dark:text-white">

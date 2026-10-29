@@ -16,6 +16,8 @@ export interface TMDBTitle {
 
 export interface TMDBTrendingTitle extends TMDBTitle {
   media_type: TMDBMediaType;
+  imdbRating?: number;
+  imdbVotes?: string | null;
 }
 
 export interface StreamingProvider {
@@ -158,4 +160,47 @@ export async function getCachedTitleEnrichment(
   }
 
   return data;
+}
+
+
+export async function getPopularMovies(): Promise<TMDBTrendingTitle[]> {
+  const MAX_PAGES = 20;
+
+  const sources = [
+    "popular",
+    "top_rated",
+    "now_playing",
+    "upcoming",
+  ] as const;
+
+  const results = await Promise.all(
+    sources.map(async (action) => {
+      const pages = await Promise.all(
+        Array.from({ length: MAX_PAGES }, (_, index) =>
+          invokeTMDB<TMDBListResponse>({
+            type: "movie",
+            action,
+            page: index + 1,
+          })
+        )
+      );
+
+      return pages.flatMap((page) => page.results ?? []);
+    })
+  );
+
+  const uniqueMovies = new Map<number, TMDBTrendingTitle>();
+
+  for (const movies of results) {
+    for (const movie of movies) {
+      if (!uniqueMovies.has(movie.id)) {
+        uniqueMovies.set(movie.id, {
+          ...movie,
+          media_type: "movie",
+        });
+      }
+    }
+  }
+
+  return Array.from(uniqueMovies.values()).slice(0, 50);
 }

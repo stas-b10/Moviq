@@ -1,18 +1,24 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getTrendingTitles,
   getPopularTitles,
+  getPopularMovies,
   getCachedTitleEnrichment,
   type TMDBTrendingTitle,
   type TMDBEnrichment,
 } from "../utils/types/tmdb";
 import {FaArrowLeft, FaArrowRight } from "react-icons/fa6";
-import MoviesCard from "../components/MoviesCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
-
 import "swiper/css";
+import TrendingCard from "../components/TrendingCard";
+import MoviesCard from "../components/MoviesCard";
+import MovieFilters from "../components/MovieFilters";
+import {
+  defaultFilters,
+  type MovieFilterValues,
+} from "../utils/types/movie_filters";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -23,6 +29,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const trendsSwiperRef = useRef<SwiperType | null>(null);
+  const moviesSwiperRef = useRef<SwiperType | null>(null);
+  const [popularMovies, setPopularMovies] = useState<TMDBTrendingTitle[]>([]);
+  const currentYear = new Date().getFullYear();
+
+  const [movieFilters, setMovieFilters] = useState<MovieFilterValues>({ ...defaultFilters });
 
   useEffect(() => {
     let active = true;
@@ -208,6 +219,28 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+  let active = true;
+
+  const loadPopularMovies = async () => {
+    try {
+      const movies = await getPopularMovies();
+
+      if (active) {
+        setPopularMovies(movies);
+      }
+    } catch (error) {
+      console.error("Failed to load popular movies:", error);
+    }
+  };
+
+  void loadPopularMovies();
+
+  return () => {
+    active = false;
+  };
+}, []);
+
 
 useEffect(() => {
   if (trending.length < 2) return;
@@ -227,6 +260,7 @@ useEffect(() => {
 
   return Array.isArray(providers) && providers.length > 0;
 });
+
 
 const featured =
   titlesWithProviders.length > 0
@@ -266,6 +300,76 @@ const featured =
         }
       )
     : [];
+
+  const filteredMovies = useMemo(() => {
+  const filtered = popularMovies.filter((movie) => {
+    const rating = movie.imdbRating;
+
+    const votes = Number(
+      movie.imdbVotes?.replace(/,/g, "") ?? 0
+    );
+
+    if (
+      rating === undefined ||
+      rating < movieFilters.minRating ||
+      rating > movieFilters.maxRating
+    ) {
+      return false;
+    }
+
+    if (votes < movieFilters.minVotes) {
+      return false;
+    }
+
+    const releaseDate = movie.release_date;
+
+    if (!releaseDate) {
+      return false;
+    }
+
+    const year = Number(releaseDate.slice(0, 4));
+
+    if (
+      !Number.isFinite(year) ||
+      year < movieFilters.startYear ||
+      year > movieFilters.endYear
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  switch (movieFilters.sortBy) {
+    case "rating":
+      return filtered.sort(
+        (a, b) => (b.imdbRating ?? 0) - (a.imdbRating ?? 0)
+      );
+
+    case "votes":
+      return filtered.sort(
+        (a, b) =>
+          Number(b.imdbVotes?.replace(/,/g, "") ?? 0) -
+          Number(a.imdbVotes?.replace(/,/g, "") ?? 0)
+      );
+
+    case "newest":
+      return filtered.sort(
+        (a, b) =>
+          (b.release_date ?? "").localeCompare(a.release_date ?? "")
+      );
+
+    case "oldest":
+      return filtered.sort(
+        (a, b) =>
+          (a.release_date ?? "").localeCompare(b.release_date ?? "")
+      );
+
+    case "popular":
+    default:
+      return filtered;
+  }
+}, [popularMovies, movieFilters]);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#EBFAFF] text-slate-950 dark:bg-[#030A1B] dark:text-white">
@@ -441,7 +545,7 @@ const featured =
         </div>
       </section>
 
-      <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
+      <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
         <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px]  lg:gap-8 lg:px-10 lg:pb-4 lg:pt-4">
             <h2 className="space-grotesk-bold text-[34px] ">
               Trends
@@ -503,10 +607,79 @@ const featured =
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {trending.slice(0, 50).map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <MoviesCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                  <TrendingCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
                 </SwiperSlide>
               ))}
             </div>
+            </Swiper>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-8 lg:px-10 lg:pb-4 lg:pt-4">
+            <h2 className="space-grotesk-bold text-[34px] ">
+              Movies
+            </h2>
+             <div className="relative">
+              <button
+              type="button"
+              onClick={() => {
+                const swiper = moviesSwiperRef.current;
+                if (!swiper) return;
+
+                swiper.slideTo(Math.max(swiper.activeIndex - 5, 0));
+              }}
+              aria-label="Previous titles"
+              className="absolute -left-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            >
+              <FaArrowLeft />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const swiper = moviesSwiperRef.current;
+                if (!swiper) return;
+
+                swiper.slideTo(
+                  Math.min(swiper.activeIndex + 5, swiper.slides.length - 1)
+                );
+              }}
+              aria-label="Next titles"
+              className="absolute -right-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            >
+              <FaArrowRight />
+            </button>
+             <Swiper
+              onSwiper={(swiper) => {
+                moviesSwiperRef.current = swiper;
+              }}
+              slidesPerView={2}
+              slidesPerGroup={5}
+              spaceBetween={16}
+              speed={400}
+              watchOverflow
+              breakpoints={{
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 16,
+                },
+                768: {
+                  slidesPerView: 4,
+                  spaceBetween: 20,
+                },
+                1024: {
+                  slidesPerView: 6,
+                  spaceBetween: 16,
+                },
+              }}
+            >
+              {popularMovies.map((title) => (
+                <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
+                  <MoviesCard title={title} isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
         </div>
