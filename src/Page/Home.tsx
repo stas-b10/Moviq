@@ -336,7 +336,7 @@ const featured =
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
-                  className="mt-6 rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950"
+                  className="mt-6 rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 cursor-pointer"
                 >
                   Try again
                 </button>
