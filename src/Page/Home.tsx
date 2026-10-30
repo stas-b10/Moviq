@@ -5,10 +5,13 @@ import {
   getPopularTitles,
   getPopularMovies,
   getCachedTitleEnrichment,
+  getMovieGenres,
+  discoverMoviesByGenres,
   type TMDBTrendingTitle,
   type TMDBEnrichment,
+  type TMDBGenre,
 } from "../utils/types/tmdb";
-import {FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import {FaArrowLeft, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
@@ -20,14 +23,40 @@ export default function Home() {
 
   const [trending, setTrending] = useState<TMDBTrendingTitle[]>([]);
   const [enrichments, setEnrichments] = useState< Record<string, TMDBEnrichment>>({});
+  const [popularMovies, setPopularMovies] = useState<TMDBTrendingTitle[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<TMDBTrendingTitle[]>([]);
+  const [movieGenres, setMovieGenres] = useState<TMDBGenre[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [moviesLoading, setMoviesLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const trendsSwiperRef = useRef<SwiperType | null>(null);
   const moviesSwiperRef = useRef<SwiperType | null>(null);
-  const [popularMovies, setPopularMovies] = useState<TMDBTrendingTitle[]>([]);
+  const genreSwiperRef = useRef<SwiperType | null>(null);
+  
 
+  useEffect(() => {
+    let active = true;
 
+    const loadGenres = async () => {
+      try {
+       const genres = await getMovieGenres();
+
+        if (active) {
+          setMovieGenres(genres);
+        }
+      } catch (error) {
+        console.error("Failed to load movie genres:", error);
+      }
+    };
+
+    void loadGenres();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -235,6 +264,70 @@ export default function Home() {
   };
 }, []);
 
+useEffect(() => {
+  let active = true;
+
+  const loadMovies = async () => {
+    setMoviesLoading(true);
+
+    try {
+      if (selectedGenres.length === 0) {
+        const movies = await getPopularMovies();
+
+        if (active) {
+          setFilteredMovies(movies.slice(0, 50));
+        }
+
+        return;
+      }
+
+      const pages = await Promise.all([
+        discoverMoviesByGenres(selectedGenres, 1),
+        discoverMoviesByGenres(selectedGenres, 2),
+        discoverMoviesByGenres(selectedGenres, 3),
+      ]);
+
+      if (!active) return;
+
+      const uniqueMovies = new Map<number, TMDBTrendingTitle>();
+
+      for (const page of pages) {
+        for (const movie of page) {
+          if (!uniqueMovies.has(movie.id)) {
+            uniqueMovies.set(movie.id, movie);
+          }
+
+          if (uniqueMovies.size >= 50) break;
+        }
+
+        if (uniqueMovies.size >= 50) break;
+      }
+
+      if (active) {
+        setFilteredMovies(
+          Array.from(uniqueMovies.values()).slice(0, 50)
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load movies:", error);
+
+      if (active) {
+        setFilteredMovies([]);
+      }
+    } finally {
+      if (active) {
+        setMoviesLoading(false);
+      }
+    }
+  };
+
+  void loadMovies();
+
+  return () => {
+    active = false;
+  };
+}, [selectedGenres]);
+
 
 useEffect(() => {
   if (trending.length < 2) return;
@@ -294,6 +387,8 @@ const featured =
         }
       )
     : [];
+
+    const toggleGenre = (genreId: number) => { setSelectedGenres((current) => current.includes(genreId) ? current.filter((id) => id !== genreId) : [...current, genreId]);};
 
 
   return (
@@ -471,10 +566,17 @@ const featured =
       </section>
 
       <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
-        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px]  lg:gap-8 lg:px-10 lg:pb-4 lg:pt-4">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px]  lg:gap-2 lg:px-10 lg:pb-4 lg:pt-4">
+            <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
               Trends
             </h2>
+
+            <button type="button" onClick={() => navigate("/all_trendings")} className="inter-bold flex mt-4 shrink-0 items-center gap-2 text-[15px] cursor-pointer text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white dark:hover:text-[#228EE5]">
+              See More
+              <FaArrowRight />
+            </button>
+            </div>
              <div className="relative">
               <button
               type="button"
@@ -542,10 +644,50 @@ const featured =
       </section>
 
       <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
-        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-8 lg:px-10 lg:pb-4 lg:pt-4">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-4">
+            <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
               Movies
             </h2>
+            <button type="button" onClick={() => navigate("/all_movies")} className="inter-bold flex mt-4 shrink-0 items-center gap-2 text-[15px] cursor-pointer text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white dark:hover:text-[#228EE5]">
+              See More
+              <FaArrowRight />
+            </button>
+            </div>
+
+            <div className="relative mx-auto mt-8 mb-8 w-full max-w-[1460px]">
+               <button type="button" onClick={() => genreSwiperRef.current?.slidePrev()} aria-label="Previous genres" className="absolute -left-8 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-900 transition hover:text-[#228EE5] dark:text-white cursor-pointer">
+                 <FaChevronLeft className="text-[17px]" />
+                </button>
+                <button type="button" onClick={() => genreSwiperRef.current?.slideNext()} aria-label="Previous genres" className="absolute -right-10 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-900 transition hover:text-[#228EE5] dark:text-white cursor-pointer">
+                 <FaChevronRight className="text-[17px]" />
+                </button>
+                <Swiper key="movie-genre-swiper" onSwiper={(swiper) => { genreSwiperRef.current = swiper; }}
+                  slidesPerView={9.5}
+                  slidesPerGroup={3}
+                  spaceBetween={0}
+                  speed={350}
+                  watchOverflow
+                  breakpoints={{ 480: { slidesPerView: 5.5, spaceBetween: 6,}, 640: { slidesPerView: 7.5, spaceBetween: 6, }, 1024: { slidesPerView: 9.5, spaceBetween: 8,},}} className="!w-full !px-1"
+                >
+                  <SwiperSlide>
+                     <button type="button" onClick={() => setSelectedGenres([])} aria-pressed={selectedGenres.length === 0} className={`w-[80%] inter-regular truncate rounded-full border px-2 py-2.5 text-[13px] leading-tight transition duration-200 cursor-pointer ${ selectedGenres.length === 0 ? "border-[#EC4899] bg-[#EC4899] text-white" : "border-[#EC4899]/40 text-slate-700 hover:border-[#EC4899] dark:text-white"}`}>
+                        All
+                      </button>
+                  </SwiperSlide>
+                  {movieGenres.map((genre) => {
+                     const isSelected = selectedGenres.includes(genre.id);
+                     return (
+                       <SwiperSlide key={genre.id}>
+                         <button type="button" onClick={() => toggleGenre(genre.id)} aria-pressed={isSelected} title={genre.name} className={`w-[80%] inter-regular truncate rounded-full border px-2 py-2.5 text-[13px] leading-tight transition duration-200 cursor-pointer ${ isSelected ? "border-[#EC4899] bg-[#EC4899] text-white" : "border-[#EC4899]/40 text-slate-700 hover:border-[#EC4899] hover:bg-[#EC4899]/10 dark:text-white"}`}>
+                           {genre.name}
+                          </button>
+                        </SwiperSlide>
+                      )
+                    })}
+                </Swiper>
+            </div>
+            
              <div className="relative">
               <button
               type="button"
@@ -560,7 +702,6 @@ const featured =
             >
               <FaArrowLeft />
             </button>
-
             <button
               type="button"
               onClick={() => {
@@ -600,7 +741,7 @@ const featured =
                 },
               }}
             >
-              {popularMovies.map((title) => (
+              {filteredMovies.map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
                   <MoviesCard title={title} isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
                 </SwiperSlide>

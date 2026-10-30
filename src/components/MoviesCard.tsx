@@ -29,9 +29,9 @@ export default function MoviesCard({
 
   return (
     <article onClick={openDetails} onKeyDown={(event) => { if (event.key === "Enter") { openDetails(); }}} role="link" tabIndex={0} aria-label={`View details for ${name}`}
-            className="group relative w-full cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#228EE5] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#030A1B]"
+            className="group relative w-full cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#228EE5] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#030A1B] "
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-slate-200 dark:bg-[#111D33]">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-slate-200 dark:bg-[#111D33] shadow-[0_2px_10px_rgba(34,142,229,0.15)] transition-all duration-300 hover:shadow-[0_0_22px_rgba(34,142,229,0.4)]">
         {posterUrl ? (
           <img src={posterUrl} alt={`${name} poster`} loading="lazy" className="h-full w-full object-cover"/>
         ) : (

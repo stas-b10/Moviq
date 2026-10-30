@@ -13,6 +13,7 @@ export interface TMDBTitle {
   release_date?: string;
   first_air_date?: string;
   media_type?: TMDBMediaType;
+  genre_ids?: number[];
 }
 
 export interface TMDBTrendingTitle extends TMDBTitle {
@@ -49,6 +50,15 @@ interface TMDBTrendingResponse {
   results: (TMDBTitle & {
     media_type: TMDBMediaType | "person";
   })[];
+}
+
+export interface TMDBGenre {
+  id: number;
+  name: string;
+}
+
+interface TMDBGenresResponse {
+  genres: TMDBGenre[];
 }
 
 const POPULAR_MOVIES_CACHE_KEY = "moviq:movies:v1";
@@ -282,4 +292,31 @@ export async function getPopularMovies(
   } finally {
     popularMoviesRequest = null;
   }
+}
+
+export async function getMovieGenres(): Promise<TMDBGenre[]> {
+  const data = await invokeTMDB<TMDBGenresResponse>({
+    type: "movie",
+    action: "movie_genres",
+  });
+
+  return data.genres ?? [];
+}
+
+export async function discoverMoviesByGenres(
+  genreIds: number[],
+  page = 1
+): Promise<TMDBTrendingTitle[]> {
+  const data = await invokeTMDB<TMDBListResponse>({
+    type: "movie",
+    action: "discover",
+    page,
+    with_genres: genreIds.join(","),
+    sort_by: "popularity.desc",
+  });
+
+  return (data.results ?? []).map((movie) => ({
+    ...movie,
+    media_type: "movie" as const,
+  }));
 }

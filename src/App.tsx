@@ -16,6 +16,8 @@ import ResetPassword from "./Page/ResetPassword";
 import SuccesfulReseted from "./Page/SuccsefulReseted";
 import Profile from "./Page/Profile";
 import About from "./Page/About";
+import AllMovies from "./Page/AllMovies";
+import AllTrendings from "./Page/AllTrendings";
 
 export default function App() {
   const location = useLocation();
@@ -67,6 +69,8 @@ export default function App() {
               <Route path="/reset_password" element={<ResetPassword />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/about" element={<About />} />
+              <Route path="/all_movies" element={<AllMovies />} />
+              <Route path="/all_trendings" element={<AllTrendings />} />
               <Route path="/home" element={<Home />} />
             </Routes>
           </motion.div>
