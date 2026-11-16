@@ -5,10 +5,8 @@ import {
   FaRotateLeft,
   FaXmark,
 } from "react-icons/fa6";
-import {defaultFilters,fieldClass} from "../utils/types/movie_filters"
+import {defaultFilters,fieldClass,currentYear} from "../utils/types/movie_filters"
 import type {MovieFilterValues, MovieFiltersProps} from "../utils/types/movie_filters"
-
-const currentYear = new Date().getFullYear();
 
 export default function MovieFilters({
   filters,
@@ -96,7 +94,6 @@ export default function MovieFilters({
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* IMDb rating */}
             <section>
               <label className="mb-3 block text-sm font-semibold text-slate-900 dark:text-white">
                 IMDb rating
@@ -161,7 +158,6 @@ export default function MovieFilters({
               </div>
             </section>
 
-            {/* Country */}
             <section>
               <label
                 htmlFor="movie-country"
@@ -189,7 +185,6 @@ export default function MovieFilters({
               </select>
             </section>
 
-            {/* Minimum votes */}
             <section>
               <label
                 htmlFor="movie-votes"
@@ -217,7 +212,6 @@ export default function MovieFilters({
               </select>
             </section>
 
-            {/* Genres */}
             <section className="sm:col-span-2 lg:col-span-3">
               <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
                 Genres
@@ -246,7 +240,6 @@ export default function MovieFilters({
               </div>
             </section>
 
-            {/* Release year */}
             <section>
               <label className="mb-3 block text-sm font-semibold text-slate-900 dark:text-white">
                 Release year
@@ -292,7 +285,6 @@ export default function MovieFilters({
               </div>
             </section>
 
-            {/* Sorting */}
             <section>
               <label
                 htmlFor="movie-sort"

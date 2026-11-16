@@ -16,7 +16,7 @@ export interface MovieFiltersProps {
   countries: { iso_3166_1: string; english_name: string }[];
 }
 
-const currentYear = new Date().getFullYear();
+export const currentYear = new Date().getFullYear();
 
 export const defaultFilters: MovieFilterValues = {
   minRating: 6.7,

@@ -303,6 +303,15 @@ export async function getMovieGenres(): Promise<TMDBGenre[]> {
   return data.genres ?? [];
 }
 
+export async function getTvGenres(): Promise<TMDBGenre[]> {
+  const data = await invokeTMDB<TMDBGenresResponse>({
+    type: "tv",
+    action: "tv_genres",
+  });
+
+  return data.genres ?? [];
+}
+
 export async function discoverMoviesByGenres(
   genreIds: number[],
   page = 1
@@ -318,5 +327,23 @@ export async function discoverMoviesByGenres(
   return (data.results ?? []).map((movie) => ({
     ...movie,
     media_type: "movie" as const,
+  }));
+}
+
+export async function discoverSeriesByGenres(
+  genreIds: number[],
+  page = 1
+): Promise<TMDBTrendingTitle[]> {
+  const data = await invokeTMDB<TMDBListResponse>({
+    type: "tv",
+    action: "discover",
+    page,
+    with_genres: genreIds.join(","),
+    sort_by: "popularity.desc",
+  });
+
+  return (data.results ?? []).map((movie) => ({
+    ...movie,
+    media_type: "tv" as const,
   }));
 }
