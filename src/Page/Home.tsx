@@ -20,6 +20,7 @@ import "swiper/css";
 import TrendingCard from "../components/TrendingCard";
 import MoviesCard from "../components/MoviesCard";
 import SeriesCard from "../components/SeriesCard";
+import CollectionCard from "../components/CollectionCard";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -1082,6 +1083,12 @@ const featured =
             </div>
           </div>
         )}
+      </section>
+
+      
+
+      <section className="relative min-h-[320px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
+
       </section>
 
     </main>
