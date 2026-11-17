@@ -6,6 +6,9 @@ export interface TMDBCollection {
   overview: string;
   poster_path: string | null;
   backdrop_path: string | null;
+  average_rating?: number;
+  total_vote_count?: number;
+  popularity_score?: number;
 }
 
 export interface TMDBCollectionMovie {
@@ -38,6 +41,7 @@ async function invokeCollections<T>(
   );
 
   if (error) {
+    console.error("Supabase function error:", error);
     throw new Error(error.message || "Collection request failed.");
   }
 
@@ -74,6 +78,14 @@ export async function getMovieCollection(
 ): Promise<TMDBCollectionDetails> {
   return invokeCollections<TMDBCollectionDetails>({
     action: "collection_details",
-    collectionId,
+    id: collectionId,
   });
+}
+
+export async function getPopularCollections(): Promise<TMDBCollection[]> {
+  const data = await invokeCollections<TMDBCollectionsResponse>({
+    action: "discover_collections",
+  });
+
+  return data.results ?? [];
 }

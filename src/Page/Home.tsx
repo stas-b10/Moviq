@@ -21,6 +21,7 @@ import TrendingCard from "../components/TrendingCard";
 import MoviesCard from "../components/MoviesCard";
 import SeriesCard from "../components/SeriesCard";
 import CollectionCard from "../components/CollectionCard";
+import { getPopularCollections,type TMDBCollection,} from "../utils/types/collection";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ export default function Home() {
   const [selectedSeriesGenres, setSelectedSeriesGenres] = useState<number[]>([]);
   const [filteredSeries, setFilteredSeries] = useState<TMDBTrendingTitle[]>([]);
   const [seriesLoading, setSeriesLoading] = useState(false);
+  const [collections, setCollections] = useState<TMDBCollection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(true);
   const [mostPopularSeries, setMostPopularSeries] = useState<TMDBTrendingTitle | null>(null);
   const [popularSeriesEnrichment, setPopularSeriesEnrichment] = useState<TMDBEnrichment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +49,34 @@ export default function Home() {
   const moviesSwiperRef = useRef<SwiperType | null>(null);
   const genreSwiperRef = useRef<SwiperType | null>(null);
   const seriesSwiperRef = useRef<SwiperType | null>(null);
+  const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const seriesGenreSwiperRef = useRef<SwiperType | null>(null);
+
+  useEffect(() => {
+  let active = true;
+
+  const loadCollections = async () => {
+    try {
+      const data = await getPopularCollections();
+
+      if (active) {
+        setCollections(data);
+      }
+    } catch (error) {
+      console.error("Failed to load popular collections:", error);
+    } finally {
+      if (active) {
+        setCollectionsLoading(false);
+      }
+    }
+  };
+
+  void loadCollections();
+
+  return () => {
+    active = false;
+  };
+}, []);
 
   useEffect(() => {
     let active = true;
@@ -980,43 +1010,17 @@ const featured =
             </div>
             
              <div className="relative">
-              <button
-              type="button"
-              onClick={() => {
-                const swiper = seriesSwiperRef.current;
-                if (!swiper) return;
-
-                swiper.slideTo(Math.max(swiper.activeIndex - 5, 0));
-              }}
-              aria-label="Previous titles"
-              className="absolute -left-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            <button type="button" onClick={() => { const swiper = seriesSwiperRef.current; if (!swiper) return; swiper.slideTo(Math.max(swiper.activeIndex - 5, 0));}} aria-label="Previous titles"
+                    className="absolute -left-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
             >
               <FaArrowLeft />
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                const swiper = seriesSwiperRef.current;
-                if (!swiper) return;
-
-                swiper.slideTo(
-                  Math.min(swiper.activeIndex + 5, swiper.slides.length - 1)
-                );
-              }}
-              aria-label="Next titles"
-              className="absolute -right-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+            <button type="button" onClick={() => { const swiper = seriesSwiperRef.current; if (!swiper) return; swiper.slideTo( Math.min(swiper.activeIndex + 5, swiper.slides.length - 1));}} aria-label="Next titles"
+                    className="absolute -right-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
             >
               <FaArrowRight />
             </button>
-             <Swiper
-              onSwiper={(swiper) => {
-                seriesSwiperRef.current = swiper;
-              }}
-              slidesPerView={2}
-              slidesPerGroup={5}
-              spaceBetween={16}
-              speed={400}
-              watchOverflow
+             <Swiper onSwiper={(swiper) => { seriesSwiperRef.current = swiper;}} slidesPerView={2} slidesPerGroup={5} spaceBetween={16} speed={400} watchOverflow
               breakpoints={{
                 640: {
                   slidesPerView: 3,
@@ -1087,9 +1091,85 @@ const featured =
 
       
 
-      <section className="relative min-h-[320px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
+<section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
+  <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
 
-      </section>
+    <div className="mb-8 flex items-center justify-between">
+      <h2 className="space-grotesk-bold text-[34px]">
+        Popular Collections
+      </h2>
+      <button type="button" onClick={() => navigate("/all_collections")} className="inter-bold flex mt-4 shrink-0 items-center gap-2 text-[15px] cursor-pointer text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white dark:hover:text-[#228EE5]">
+        See More
+       <FaArrowRight />
+      </button>
+    </div>
+    
+
+    <div className="relative">
+      <button type="button" onClick={() => { const swiper = collectionsSwiperRef.current; if (!swiper) return; swiper.slideTo(Math.max(swiper.activeIndex - 5, 0));}} aria-label="Previous titles"
+              className="absolute -left-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+      >
+       <FaArrowLeft />
+      </button>
+      <button type="button" onClick={() => { const swiper = collectionsSwiperRef.current; if (!swiper) return; swiper.slideTo( Math.min(swiper.activeIndex + 5, swiper.slides.length - 1));}} aria-label="Next titles"
+              className="absolute -right-14 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-xl text-slate-900 transition hover:text-[#228EE5] dark:text-white border border-gray-600 hover:border-[#228EE5]/70 backdrop-blur-md transition duration-200 cursor-pointer"
+      >
+        <FaArrowRight />
+      </button>
+        <Swiper onSwiper={(swiper) => { collectionsSwiperRef.current = swiper;}} slidesPerView={2} slidesPerGroup={5} spaceBetween={16} speed={400} watchOverflow
+              breakpoints={{
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 16,
+                },
+                768: {
+                  slidesPerView: 4,
+                  spaceBetween: 20,
+                },
+                1024: {
+                  slidesPerView: 6,
+                  spaceBetween: 16,
+                },
+              }}
+            >
+    {collectionsLoading ? (
+     Array.from({ length: 5 }).map((_, index) => (
+      <SwiperSlide key={index} className="!h-auto py-2">
+        <div className="aspect-[3/4] animate-pulse rounded-xl bg-slate-300 dark:bg-white/10" />
+      </SwiperSlide>
+    ))
+    ) : collections.length > 0 ? (
+      collections.map((collection) => (
+        <SwiperSlide key={collection.id} className="!h-auto py-2">
+          <CollectionCard collection={collection} />
+        </SwiperSlide>
+      ))
+    ) : (
+      <p className="py-12 text-center text-slate-500 dark:text-white/50">
+        No collections available.
+      </p>
+    )}
+      </Swiper>
+    </div>
+  </div>
+</section>
+
+<section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
+  <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
+    <div className="mb-8 flex items-center justify-between">
+      <h2 className="space-grotesk-bold text-[34px]">
+        Popular Actors
+      </h2>
+      <button type="button" onClick={() => navigate("/all_actors")} className="inter-bold flex mt-4 shrink-0 items-center gap-2 text-[15px] cursor-pointer text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white dark:hover:text-[#228EE5]">
+        See More
+       <FaArrowRight />
+      </button>
+    </div>
+
+    
+
+    </div>
+  </section>
 
     </main>
   );
