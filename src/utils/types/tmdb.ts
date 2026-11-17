@@ -335,15 +335,15 @@ export async function discoverSeriesByGenres(
   page = 1
 ): Promise<TMDBTrendingTitle[]> {
   const data = await invokeTMDB<TMDBListResponse>({
-    type: "movie",
+    type: "tv",
     action: "discover",
     page,
     with_genres: genreIds.join(","),
     sort_by: "popularity.desc",
   });
 
-  return (data.results ?? []).map((movie) => ({
-    ...movie,
-    media_type: "movie" as const,
+  return (data.results ?? []).map((series) => ({
+    ...series,
+    media_type: "tv" as const,
   }));
 }

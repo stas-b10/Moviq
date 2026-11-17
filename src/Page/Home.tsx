@@ -1057,7 +1057,7 @@ const featured =
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
             <div className="relative z-10 flex min-h-[420px] flex-col items-center justify-end px-6 pb-12 pt-[400px] text-center sm:px-12 sm:pb-16 lg:min-h-[480px] lg:px-16 lg:pb-20">
-              <div className="flex flex-row items-center justify-between gap-[550px]">
+              <div className="flex flex-row items-center justify-between gap-[450px]">
               <span className="space-grotesk-bold text-[20px] font-bold text-[#E5E5E5]">
                 #1 Most Popular Series right now
               </span>
