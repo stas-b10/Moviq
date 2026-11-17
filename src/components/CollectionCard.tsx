@@ -82,7 +82,6 @@ export default function CollectionCard({
       aria-label={`View ${name} collection`}
       className="group relative aspect-[3/4] w-full cursor-pointer transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#228EE5]"
     >
-      {/* Third poster - back */}
       <div className="absolute inset-0 translate-x-[14px] translate-y-[9px] overflow-hidden rounded-xl bg-[#6650A5] shadow-lg">
         {getPosterUrl(2) && (
           <img
@@ -93,7 +92,6 @@ export default function CollectionCard({
         )}
       </div>
 
-      {/* Second poster - middle */}
       <div className="absolute inset-0 translate-x-[7px] translate-y-[5px] overflow-hidden rounded-xl bg-[#28234D] shadow-lg">
         {getPosterUrl(1) && (
           <img
@@ -104,7 +102,6 @@ export default function CollectionCard({
         )}
       </div>
 
-      {/* First poster - front */}
       <div className="relative h-full w-full overflow-hidden rounded-xl bg-[#111D33] shadow-[0_2px_10px_rgba(34,142,229,0.15)] transition-all duration-300 group-hover:shadow-[0_0_22px_rgba(34,142,229,0.4)]">
         {getPosterUrl(0) || fallbackPoster ? (
           <img
@@ -119,10 +116,8 @@ export default function CollectionCard({
           </div>
         )}
 
-        {/* Dark overlay */}
         <div className="pointer-events-none absolute inset-0 bg-black/35 transition-colors duration-300 group-hover:bg-black/20" />
 
-        {/* Collection name */}
         <div className="absolute inset-0 flex items-center justify-center px-2">
           <h3
             title={name}
