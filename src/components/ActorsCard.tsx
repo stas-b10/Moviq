@@ -114,23 +114,18 @@ return (
       ) : people.length > 0 ? (
         people.slice(0,30).map((person) => (
           <SwiperSlide key={person.id}>
-            <div className="group flex cursor-default flex-col items-center gap-3 py-2">
-
-              <div className="h-[90px] w-[90px] overflow-hidden rounded-full border-2 border-transparent transition-all duration-300 group-hover:scale-105 group-hover:border-[#228EE5] sm:h-[105px] sm:w-[105px]">
-
+            <div className="flex flex-col items-center gap-3 py-2">
+              <div onClick={() => navigate(`/person/${person.id}`)} className="h-[90px] w-[90px] cursor-pointer overflow-hidden rounded-full border-2 border-transparent transition-all duration-300 hover:scale-105 hover:border-[#228EE5] sm:h-[105px] sm:w-[105px]">
                 <img
                   src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
                   alt={person.name}
                   loading="lazy"
                   className="h-full w-full object-cover"
                 />
-
               </div>
-
-              <p className="inter-bold w-full truncate text-center text-sm text-slate-800 transition-colors duration-200 group-hover:text-[#228EE5] dark:text-white">
+              <p onClick={() => navigate(`/person/${person.id}`)} className="inter-bold w-full cursor-pointer truncate text-center text-sm text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white">
                 {person.name}
               </p>
-
             </div>
           </SwiperSlide>
         ))
