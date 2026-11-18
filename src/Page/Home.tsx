@@ -23,6 +23,7 @@ import SeriesCard from "../components/SeriesCard";
 import CollectionCard from "../components/CollectionCard";
 import { getPopularCollections,type TMDBCollection,} from "../utils/types/collection";
 import ActorsCard from "../components/ActorsCard";
+import KidsSection from "../components/KidsSection";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -1159,6 +1160,14 @@ const featured =
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
     <div>
       <ActorsCard  />
+    </div>
+    </div>
+ </section>
+
+ <section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
+  <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
+    <div>
+      <KidsSection  />
     </div>
     </div>
  </section>
