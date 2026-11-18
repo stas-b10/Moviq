@@ -73,12 +73,10 @@ export async function searchMovieCollections(
 }
 
 
-export async function getMovieCollection(
-  collectionId: number
-): Promise<TMDBCollectionDetails> {
-  return invokeCollections<TMDBCollectionDetails>({
+export async function getMovieCollection(collectionId: number) {
+  return invokeCollections({
     action: "collection_details",
-    id: collectionId,
+    collectionId,
   });
 }
 

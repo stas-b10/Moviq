@@ -22,6 +22,7 @@ import MoviesCard from "../components/MoviesCard";
 import SeriesCard from "../components/SeriesCard";
 import CollectionCard from "../components/CollectionCard";
 import { getPopularCollections,type TMDBCollection,} from "../utils/types/collection";
+import ActorsCard from "../components/ActorsCard";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -1061,7 +1062,7 @@ const featured =
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
             <div className="relative z-10 flex min-h-[420px] flex-col items-center justify-end px-6 pb-12 pt-[400px] text-center sm:px-12 sm:pb-16 lg:min-h-[480px] lg:px-16 lg:pb-20">
-              <div className="flex flex-row items-center justify-between gap-[450px]">
+              <div className="flex flex-row items-center justify-between gap-[50px]">
               <span className="space-grotesk-bold text-[20px] font-bold text-[#E5E5E5]">
                 #1 Most Popular Series right now
               </span>
@@ -1156,20 +1157,11 @@ const featured =
 
 <section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
-    <div className="mb-8 flex items-center justify-between">
-      <h2 className="space-grotesk-bold text-[34px]">
-        Popular Actors
-      </h2>
-      <button type="button" onClick={() => navigate("/all_actors")} className="inter-bold flex mt-4 shrink-0 items-center gap-2 text-[15px] cursor-pointer text-slate-800 transition-colors duration-200 hover:text-[#228EE5] dark:text-white dark:hover:text-[#228EE5]">
-        See More
-       <FaArrowRight />
-      </button>
+    <div>
+      <ActorsCard  />
     </div>
-
-    
-
     </div>
-  </section>
+ </section>
 
     </main>
   );
