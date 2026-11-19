@@ -4,6 +4,7 @@ import kids3 from "../assets/images/kid_three.png";
 import {useNavigate} from "react-router-dom";
 import { MdCreate } from "react-icons/md";
 import StarBorder from "./StarBorder";
+import Particles from "./Particles";
 
 export default function KidsSection() {
   const navigate = useNavigate();
@@ -11,6 +12,31 @@ export default function KidsSection() {
 
   return (
     <section className="relative min-h-[900px] w-full overflow-hidden rounded-xl bg-[#228EE6]">
+       <div className="absolute inset-0 z-0">
+        <Particles particleColors={["#ffffff","#ffffff","#ffffff"]} particleCount={200} particleSpread={10} speed={0.1} particleBaseSize={100} glow={0.5}
+            twinkle={0.3}
+            moveParticlesOnHover = {false}
+            hoverEffect="parallax"
+            sizeRandomness={1}
+            shape="circle"
+            depthOfField={0}
+            connections={false}
+            connectionDistance={110}
+            particleHoverFactor={1}
+            hoverRadius={140}
+            drift="none"
+            driftSpeed={1}
+            alphaParticles={false}
+            disableRotation={false}
+            cameraDistance={20}
+            variation={0}
+            opacity={1}
+            clickBurst
+            intro
+            lightMode={false}
+        />
+       </div>
+       <div className="relative z-0">
       <div className="mx-auto flex w-full flex-col items-center pt-10 text-center max-w-[800px]">
         <h2 className="mt-16 text-3xl space-grotesk-bold text-white">
           Family-friendly <span className="text-[#E7BC0F]">movies/tv-shows</span>
@@ -40,6 +66,7 @@ export default function KidsSection() {
         <img src={kids3} alt="Girl" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
         <img src={kids3} aria-hidden="true" className="absolute left-0 top-full h-[400px] w-full scale-y-[-1] object-cover opacity-15"/>
        </div>
+      </div>
       </div>
     </section>
   );
