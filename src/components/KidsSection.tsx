@@ -3,6 +3,7 @@ import kids2 from "../assets/images/kid_two.png";
 import kids3 from "../assets/images/kid_three.png";
 import {useNavigate} from "react-router-dom";
 import { MdCreate } from "react-icons/md";
+import StarBorder from "./StarBorder";
 
 export default function KidsSection() {
   const navigate = useNavigate();
@@ -26,10 +27,14 @@ export default function KidsSection() {
        <div className="relative shrink-0">
         <img src={kids2} alt="Panda" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
         <img src={kids2} aria-hidden="true" className="absolute left-0 top-full h-[400px] w-full scale-y-[-1] object-cover opacity-15"/>
-        <button onClick={() => {navigate("/create-kids-profile")}} className="absolute left-1/2 top-[500px] -translate-x-1/2 rounded-lg bg-black px-3 py-3 font-bold text-white cursor-pointer flex flex-row hover:scale-105 transition-transform duration-300 ">
+        <div className="absolute left-1/2 top-[450px] z-20 -translate-x-1/2 pt-10">
+        <StarBorder onClick={() => {navigate("/create-kids-profile")}} className="text-[15px]">
+          <span className="inline-flex items-center gap-1">
           Create Kids Profile
           <MdCreate  className="ml-1 mt-1"/>
-        </button>
+          </span>
+        </StarBorder>
+        </div>
        </div>
        <div className="relative shrink-0">
         <img src={kids3} alt="Girl" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
