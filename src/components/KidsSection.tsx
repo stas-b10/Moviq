@@ -1,13 +1,41 @@
-export default function KidsSection() {
-  return (
-    <section className="relative overflow-hidden bg-[#228EE6] py-[400px] rounded-xl">
-     <div className="mx-auto max-w-[1600px] ">
-      <div className="text-center justify-center flex flex-col items-center">
-        <h2 className="text-4xl font-bold text-white mb-4">Kids Section</h2>
+import kids1 from "../assets/images/kid_one.png";
+import kids2 from "../assets/images/kid_two.png";
+import kids3 from "../assets/images/kid_three.png";
+import {useNavigate} from "react-router-dom";
+import { MdCreate } from "react-icons/md";
 
+export default function KidsSection() {
+  const navigate = useNavigate();
+
+
+  return (
+    <section className="relative min-h-[900px] w-full overflow-hidden rounded-xl bg-[#228EE6]">
+      <div className="mx-auto flex w-full flex-col items-center pt-10 text-center max-w-[800px]">
+        <h2 className="mt-16 text-3xl space-grotesk-bold text-white">
+          Family-friendly <span className="text-[#E7BC0F]">movies/tv-shows</span>
+        </h2>
+        <p className="mt-8 text-xl inter-bold text-white">
+          Create kids profiles and let them enjoy the best family-friendly content available on Moviq.
+        </p>
       </div>
-      
-     </div>
+      <div className="pl-40 mx-auto mt-12 flex max-w-[1100px] items-end justify-center gap-0">
+       <div className="relative shrink-0">
+        <img src={kids1} alt="Pig" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
+        <img src={kids1} aria-hidden="true" className="absolute left-0 top-full h-[400px] w-full scale-y-[-1] object-cover opacity-15"/>
+       </div>
+       <div className="relative shrink-0">
+        <img src={kids2} alt="Panda" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
+        <img src={kids2} aria-hidden="true" className="absolute left-0 top-full h-[400px] w-full scale-y-[-1] object-cover opacity-15"/>
+        <button onClick={() => {navigate("/create-kids-profile")}} className="absolute left-1/2 top-[500px] -translate-x-1/2 rounded-lg bg-black px-3 py-3 font-bold text-white cursor-pointer flex flex-row hover:scale-105 transition-transform duration-300 ">
+          Create Kids Profile
+          <MdCreate  className="ml-1 mt-1"/>
+        </button>
+       </div>
+       <div className="relative shrink-0">
+        <img src={kids3} alt="Girl" className="h-[400px] w-auto shrink-0 object-contain hover:scale-105 transition-transform duration-300"/>
+        <img src={kids3} aria-hidden="true" className="absolute left-0 top-full h-[400px] w-full scale-y-[-1] object-cover opacity-15"/>
+       </div>
+      </div>
     </section>
-  )
+  );
 }
