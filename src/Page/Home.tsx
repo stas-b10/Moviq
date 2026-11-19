@@ -582,7 +582,7 @@ const featured =
         <div className="absolute inset-0 hidden bg-gradient-to-r from-[#030A1B] via-[#030A1B]/0 to-[#030A1B]/0 dark:block" />
         <div className="absolute inset-0 hidden bg-gradient-to-t from-[#030A1B] via-transparent to-[#030A1B]/20 dark:block" />
 
-        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[680px] lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:px-10 lg:pb-8 lg:pt-64">
+        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[680px] lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:px-10 lg:pb-2 lg:pt-64">
           <div className="max-w-2xl">
             {loading && !featured ? (
               <div className="space-y-5">
@@ -742,7 +742,7 @@ const featured =
       </section>
 
       <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
-        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px]  lg:gap-2 lg:px-10 lg:pb-4 lg:pt-4">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-28">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
               Trends
@@ -820,7 +820,7 @@ const featured =
       </section>
 
       <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
-        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-4">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-2 lg:pt-10">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
               Movies
@@ -831,7 +831,7 @@ const featured =
             </button>
             </div>
 
-            <div className="relative mx-auto mt-8 mb-8 w-full max-w-[1460px]">
+            <div className="relative mx-auto mt-4 mb-2 w-full max-w-[1460px]">
                <button type="button" onClick={() => genreSwiperRef.current?.slidePrev()} aria-label="Previous movie genres" className="absolute -left-8 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-900 transition hover:text-[#228EE5] dark:text-white cursor-pointer">
                  <FaChevronLeft className="text-[17px]" />
                 </button>
@@ -927,8 +927,8 @@ const featured =
         </div>
       </section>
 
-        <div className="mx-auto max-w-[1600px] py-6 pb-12">
-          <h2 className="space-grotesk-bold mx-auto mt-12 max-w-[1600px] px-6 text-[34px] sm:px-10 lg:px-10">
+        <div className="mx-auto max-w-[1600px] pb-8">
+          <h2 className="space-grotesk-bold mx-auto mt-2 max-w-[1600px] px-6 text-[34px] sm:px-10 lg:px-10">
             Most Popular Movie
           </h2>
         </div>
@@ -967,7 +967,7 @@ const featured =
       </section>
 
       <section className="relative min-h-[320px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
-        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-40">
+        <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-24">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
               Tv Shows
@@ -978,7 +978,7 @@ const featured =
             </button>
             </div>
 
-            <div className="relative mx-auto mt-8 mb-8 w-full max-w-[1460px]">
+            <div className="relative mx-auto mt-4 mb-2 w-full max-w-[1460px]">
                <button type="button" onClick={() => seriesGenreSwiperRef.current?.slidePrev()} aria-label="Previous series genres" className="absolute -left-8 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-900 transition hover:text-[#228EE5] dark:text-white cursor-pointer">
                  <FaChevronLeft className="text-[17px]" />
                 </button>
@@ -1048,7 +1048,7 @@ const featured =
         </div>
       </section>
 
-      <div className="mx-auto max-w-[1600px] py-6 pb-12">
+      <div className="mx-auto max-w-[1600px] pb-8">
           <h2 className="space-grotesk-bold mx-auto mt-12 max-w-[1600px] px-6 text-[34px] sm:px-10 lg:px-10">
             Most Popular Tv Show
           </h2>
@@ -1156,7 +1156,7 @@ const featured =
   </div>
 </section>
 
-<section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
+<section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
     <div>
       <ActorsCard  />
@@ -1164,8 +1164,8 @@ const featured =
     </div>
  </section>
 
- <section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
-  <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
+ <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+  <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10 py-16">
     <div>
       <KidsSection  />
     </div>
