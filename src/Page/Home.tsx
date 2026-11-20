@@ -24,6 +24,7 @@ import CollectionCard from "../components/CollectionCard";
 import { getPopularCollections,type TMDBCollection,} from "../utils/types/collection";
 import ActorsCard from "../components/ActorsCard";
 import KidsSection from "../components/KidsSection";
+import AnimatedContent from "../components/AnimatedContent";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -570,6 +571,7 @@ const featured =
   return (
     <main className="min-h-screen overflow-hidden bg-[#EBFAFF] text-slate-950 dark:bg-[#030A1B] dark:text-white">
       <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] transition-colors duration-500 dark:bg-[#030A1B] lg:min-h-[680px]">
+        
         {backdropUrl && (
           <div className="absolute inset-0">
             <div key={backdropUrl} className="absolute inset-0 animate-[backdropFade_1.2s_ease-in-out]" style={{ backgroundImage: `url("${backdropUrl}")`, backgroundSize: "cover", backgroundPosition: "",}}/>
@@ -742,6 +744,7 @@ const featured =
       </section>
 
       <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-28">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
@@ -817,9 +820,11 @@ const featured =
             </Swiper>
           </div>
         </div>
+        </AnimatedContent>
       </section>
 
       <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[680px]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-2 lg:pt-10">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
@@ -925,15 +930,18 @@ const featured =
             </Swiper>
           </div>
         </div>
+        </AnimatedContent>
       </section>
-
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         <div className="mx-auto max-w-[1600px] pb-8">
           <h2 className="space-grotesk-bold mx-auto mt-2 max-w-[1600px] px-6 text-[34px] sm:px-10 lg:px-10">
             Most Popular Movie
           </h2>
         </div>
+        </AnimatedContent>
 
       <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[780px]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         {mostPopularMovie && (
           <div className="relative mx-auto min-h-[520px] w-[80%] overflow-hidden rounded-xl shadow-lg lg:min-h-[780px]">
             {mostPopularMovie.backdrop_path && (
@@ -964,9 +972,11 @@ const featured =
             </div>
           </div>
         )}
+        </AnimatedContent>
       </section>
 
       <section className="relative min-h-[320px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[580px]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         <div className="relative z-10 mx-auto grid min-h-[220px] max-w-[1600px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-28 sm:px-10 lg:min-h-[280px] lg:gap-2 lg:px-10 lg:pb-4 lg:pt-24">
             <div className="flex w-full items-center justify-between gap-6">
             <h2 className="space-grotesk-bold text-[34px] ">
@@ -1046,15 +1056,19 @@ const featured =
             </Swiper>
           </div>
         </div>
+        </AnimatedContent>
       </section>
 
+      <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
       <div className="mx-auto max-w-[1600px] pb-8">
           <h2 className="space-grotesk-bold mx-auto mt-12 max-w-[1600px] px-6 text-[34px] sm:px-10 lg:px-10">
             Most Popular Tv Show
           </h2>
         </div>
+      </AnimatedContent>
 
       <section className="relative min-h-[520px] overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B] lg:min-h-[780px]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
         {mostPopularSeries && (
           <div className="relative mx-auto min-h-[520px] w-[80%] overflow-hidden rounded-xl shadow-lg lg:min-h-[780px]">
             {mostPopularSeries.backdrop_path && (
@@ -1089,11 +1103,13 @@ const featured =
             </div>
           </div>
         )}
+        </AnimatedContent>
       </section>
 
       
 
 <section className="relative overflow-hidden bg-[#EBFAFF] py-16 dark:bg-[#030A1B]">
+  <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
 
     <div className="mb-8 flex items-center justify-between">
@@ -1154,22 +1170,27 @@ const featured =
       </Swiper>
     </div>
   </div>
+  </AnimatedContent>
 </section>
 
 <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+    <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
     <div>
       <ActorsCard  />
     </div>
     </div>
- </section>
+    </AnimatedContent>
+</section>
 
  <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+  <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
   <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10 py-16">
     <div>
       <KidsSection  />
     </div>
     </div>
+  </AnimatedContent>
  </section>
 
     </main>

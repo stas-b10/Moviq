@@ -206,7 +206,7 @@ const StarBorder = <T extends React.ElementType = 'button'>({
   radius = 12,
   trailLength = 0.3,
   stars = 1,
-  glow = 0.6,
+  glow = 0.7,
   sparkle = true,
   direction = 'clockwise',
   hover = 'brighten',

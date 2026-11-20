@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import { MdCreate } from "react-icons/md";
 import StarBorder from "./StarBorder";
 import Particles from "./Particles";
+import AnimatedContent from "./AnimatedContent";
 
 export default function KidsSection() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function KidsSection() {
 
   return (
     <section className="relative min-h-[900px] w-full overflow-hidden rounded-xl bg-[#228EE6]">
+        <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
        <div className="absolute inset-0 z-0">
         <Particles particleColors={["#ffffff","#ffffff","#ffffff"]} particleCount={200} particleSpread={10} speed={0.1} particleBaseSize={100} glow={0.5}
             twinkle={0.3}
@@ -68,6 +70,7 @@ export default function KidsSection() {
        </div>
       </div>
       </div>
+    </AnimatedContent>
     </section>
   );
 }

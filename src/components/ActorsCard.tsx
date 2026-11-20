@@ -9,6 +9,7 @@ import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import AnimatedContent from "./AnimatedContent";
 
 export default function ActorsCard() {
 
@@ -53,6 +54,7 @@ useEffect(() => {
 
 return (
 <section className="relative bg-[#EBFAFF] py-4 dark:bg-[#030A1B]">
+ <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
   <div className="mx-auto max-w-[1800px] ">
     <div className="mb-7 flex items-center justify-between gap-4">
       <div className="flex items-center rounded-full border border-[#228EE5]/50 p-[2px]">
@@ -139,6 +141,7 @@ return (
     </Swiper>
     </div>
   </div>
+  </AnimatedContent>
 </section>
 );
 }
