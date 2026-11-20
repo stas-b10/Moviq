@@ -31,7 +31,7 @@ export default function StudioSection() {
       </div>
       <div className="mx-auto grid max-w-[1000px] grid-cols-2 gap-10 px-5 pt-10 sm:grid-cols-3 lg:grid-cols-5">
        {studios.map((studio) => (
-        <FlipCard key={studio.id} width={190} height={160} radius={30} axis="y" flipOnClick draggable tilt glare hoverScale={1.04} background="#EBFAFF" color="#0f172a" className="w-full"
+        <FlipCard key={studio.id} width={190} height={160} radius={30} axis="y" flipOnClick draggable tilt glare hoverScale={1.04} background="var(--fc-bg)" color="#0f172a" className="w-full dark:[--flip-card-bg:#EBFAFF] [--flip-card-bg:#228EE6]"
           front={
            <div className="flex h-full w-full items-center justify-center p-7">
             <img src={studio.logo_url} alt={studio.name} loading="lazy" className="h-full w-full object-contain" />
@@ -42,7 +42,7 @@ export default function StudioSection() {
          <h3 className="space-grotesk-bold text-xl">
           {studio.name}
          </h3>
-         <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/studio/${studio.slug}`);}} className="rounded-full bg-[#228EE5] px-5 py-2 text-sm font-semibold text-white transition-colors cursor-pointer">
+         <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/studio/${studio.slug}`);}} className="rounded-full dark:bg-[#228EE5] bg-slate-700 px-3.5 py-3 border-slate-400 text-sm font-semibold text-white transition-colors cursor-pointer ">
           Explore Studio
          </button>
         </div>
