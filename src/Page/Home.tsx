@@ -25,6 +25,8 @@ import { getPopularCollections,type TMDBCollection,} from "../utils/types/collec
 import ActorsCard from "../components/ActorsCard";
 import KidsSection from "../components/KidsSection";
 import AnimatedContent from "../components/AnimatedContent";
+import Faq from "../components/Faq";
+import StudioSection from "../components/StudioSection";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -1189,6 +1191,22 @@ const featured =
     <div>
       <KidsSection  />
     </div>
+    </div>
+  </AnimatedContent>
+ </section>
+
+ <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+  <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10 py-8">
+      <Faq />
+    </div>
+  </AnimatedContent>
+ </section>
+
+ <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
+  <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10 py-10">
+      <StudioSection />
     </div>
   </AnimatedContent>
  </section>
