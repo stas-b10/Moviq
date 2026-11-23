@@ -1214,7 +1214,7 @@ const featured =
 
  <section className="relative overflow-hidden bg-[#EBFAFF] dark:bg-[#030A1B]">
   <AnimatedContent distance={150} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
-    <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10 py-10">
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-10">
       <Footer />
     </div>
   </AnimatedContent>

@@ -6,7 +6,6 @@ import {
   IoCheckmarkDoneOutline,
   IoNotificationsOutline,
 } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import type { Notification } from "../utils/types/notifications";
 import NotificationSkeleton from "./NotificationSkeleton";
@@ -22,7 +21,7 @@ export default function Notifications({
   onClose,
   onUnreadCountChange,
 }: NotificationsProps) {
-  const navigate = useNavigate();
+
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -176,9 +175,7 @@ export default function Notifications({
 
     onClose();
 
-    if (notification.link) {
-      navigate(notification.link);
-    }
+
   };
 
   const handleMarkAllAsRead = async () => {
