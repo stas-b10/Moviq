@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import AnimatedContent from "./AnimatedContent";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { FaFacebookSquare } from "react-icons/fa";
+import { FaDiscord, FaGithub, FaInstagram, FaLinkedin, FaTelegram } from "react-icons/fa6";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -17,8 +19,16 @@ export default function Footer() {
           <button className="flex flex-row cursor-pointer dark:hover:text-slate-500 hover:text-slate-400 dark:text-[#EBFAFF] text-[#030A1B] inter-regular text-[17px]" onClick={() => {navigate("/faq")}}>Faq <span><MdKeyboardArrowRight className="mt-1 text-[20px]"/></span></button>
           <button className="flex flex-row cursor-pointer dark:hover:text-slate-500 hover:text-slate-400 dark:text-[#EBFAFF] text-[#030A1B] inter-regular text-[17px]" onClick={() => {navigate("/about")}}>About us <span><MdKeyboardArrowRight className="mt-1 text-[20px]"/></span></button>
        </div>
-      <div className="mx-auto grid max-w-[1000px] grid-cols-2 gap-10  sm:grid-cols-3 lg:grid-cols-5">
-        
+      <div className="mt-20 flex items-center justify-center gap-10 text-[33px] text-slate-100 pb-20">
+         <a href="https://www.linkedin.com/in/stas-baltag-899ab141a/L" target="_blank" rel="noopener noreferrer" aria-label="Linkedin" className="transition-all hover:text-blue-400 hover:scale-110 ">
+            <FaLinkedin />
+         </a>
+         <a href="https://www.instagram.com/stas_ftbl/" aria-label="Instagram" target="_blank" rel="noopener noreferrer" className="transition-all hover:text-pink-400 hover:scale-110 ">
+            <FaInstagram />
+         </a>
+         <a href="https://github.com/stas-b10" aria-label="Github" target="_blank" rel="noopener noreferrer" className="transition-all hover:text-blue-400 hover:scale-110 ">
+            <FaGithub />
+         </a>
      </div>
     </AnimatedContent>
    </section>
