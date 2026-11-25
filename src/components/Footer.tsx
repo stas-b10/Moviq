@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AnimatedContent from "./AnimatedContent";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import {FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
 
 export default function Footer() {
   const navigate = useNavigate();

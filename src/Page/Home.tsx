@@ -57,6 +57,7 @@ export default function Home() {
   const seriesSwiperRef = useRef<SwiperType | null>(null);
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const seriesGenreSwiperRef = useRef<SwiperType | null>(null);
+  const [favorites, setFavorites] = useState<TMDBTrendingTitle[]>(() => { try { return JSON.parse(localStorage.getItem("favorites") || "[]");} catch {return [];}});
 
   useEffect(() => {
   let active = true;
@@ -571,6 +572,22 @@ const featured =
     const toggleGenre = (genreId: number) => { setSelectedGenres((current) => current.includes(genreId) ? current.filter((id) => id !== genreId) : [...current, genreId]);};
     const toggleSeriesGenre = (genreId: number) => { setSelectedSeriesGenres((current) => current.includes(genreId) ? current.filter((id) => id !== genreId) : [...current, genreId]);};
 
+
+    const handleToggleFavorite = (selectedTitle: TMDBTrendingTitle) => {
+      setFavorites((current) => {
+        const exists = current.some((item) => item.id === selectedTitle.id && item.media_type === selectedTitle.media_type);
+      if (exists) {
+        return current.filter(
+          (item) => !( item.id === selectedTitle.id && item.media_type === selectedTitle.media_type)
+        );
+      }
+      return [...current, selectedTitle];
+    });
+  };
+
+useEffect(() => {
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+}, [favorites]);
   return (
     <main className="min-h-screen overflow-hidden bg-[#EBFAFF] text-slate-950 dark:bg-[#030A1B] dark:text-white">
       <section className="relative min-h-[620px] overflow-hidden bg-[#EBFAFF] transition-colors duration-500 dark:bg-[#030A1B] lg:min-h-[680px]">
@@ -927,7 +944,7 @@ const featured =
             >
               {filteredMovies.map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <MoviesCard title={title} isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                  <MoviesCard title={title} isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
                 </SwiperSlide>
               ))}
             </Swiper>
