@@ -6,6 +6,9 @@ import { FaHeart } from "react-icons/fa6";
 import { IoIosArrowForward } from "react-icons/io";
 import StarBorder from "../components/StarBorder";
 import { useNavigate } from "react-router-dom";
+import { MdKeyboardArrowLeft } from "react-icons/md";
+
+const TITLES_PER_PAGE = 40;
 
 export default function Watchlist() {
   const [favorites, setFavorites] = useState<TMDBTrendingTitle[]>(() => {
@@ -15,7 +18,12 @@ export default function Watchlist() {
       return [];
     }
   });
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const totalPages = Math.ceil(favorites.length / TITLES_PER_PAGE);
+  const safePage = Math.max(1, Math.min(currentPage, totalPages || 1));
+  const startIndex = (safePage - 1) * TITLES_PER_PAGE;
+  const currentTitles = favorites.slice( startIndex, startIndex + TITLES_PER_PAGE);
 
 
   const handleRemoveFavorite = (selectedTitle: TMDBTrendingTitle) => {
@@ -57,11 +65,25 @@ export default function Watchlist() {
         </StarBorder>
           </div>
         ) : (
+          <>
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-6 w-[1450px]">
-            {favorites.map((title) => (
+            {currentTitles.map((title) => (
               <MoviesCard key={`${title.media_type}-${title.id}`} title={title} isFavorite={true} onToggleFavorite={handleRemoveFavorite}/>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
+              <button onClick={() => setCurrentPage(safePage - 1)} disabled={safePage === 1} className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 transition hover:bg-[#228EE5] hover:text-white disabled:cursor-not-allowed disabled:opacity-30 dark:border-white/10">
+                <MdKeyboardArrowLeft className="text-2xl" />
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                <button key={page} onClick={() => setCurrentPage(page)} className={`h-10 min-w-10 rounded-lg px-3 text-sm font-medium transition ${safePage === page ? "bg-[#228EE5] text-white" : "border border-slate-300 hover:bg-[#228EE5]/10 dark:border-white/10" }`}>
+                  {page}
+                </button>
+                
+            </div>
+          )}
+          </>
         )}
 
       </div>
