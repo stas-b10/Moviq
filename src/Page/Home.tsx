@@ -833,7 +833,7 @@ useEffect(() => {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {trending.slice(0, 50).map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <TrendingCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                  <TrendingCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
                 </SwiperSlide>
               ))}
             </div>
@@ -1070,7 +1070,7 @@ useEffect(() => {
             >
               {filteredSeries.map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <SeriesCard title={title} isFavorite={false} onToggleFavorite={(selectedTitle) => { console.log("Toggle favorite:", selectedTitle.id); }}/>
+                  <SeriesCard title={title} isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
                 </SwiperSlide>
               ))}
             </Swiper>

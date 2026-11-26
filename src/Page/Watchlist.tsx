@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import MoviesCard from "../components/MoviesCard";
 import type { TMDBTrendingTitle } from "../utils/types/tmdb";
 import { FaHeart } from "react-icons/fa6";
+import { IoIosArrowForward } from "react-icons/io";
+import StarBorder from "../components/StarBorder";
+import { useNavigate } from "react-router-dom";
 
-export default function Favorites() {
+export default function Watchlist() {
   const [favorites, setFavorites] = useState<TMDBTrendingTitle[]>(() => {
     try {
       return JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -12,6 +15,7 @@ export default function Favorites() {
       return [];
     }
   });
+  const navigate = useNavigate();
 
 
   const handleRemoveFavorite = (selectedTitle: TMDBTrendingTitle) => {
@@ -32,21 +36,7 @@ export default function Favorites() {
 
   return (
     <main className="min-h-screen bg-[#EBFAFF] px-6 py-12 text-slate-950 dark:bg-[#030A1B] dark:text-white sm:px-10">
-      <div className="mx-auto max-w-[1600px]">
-        <div className="mb-10">
-          <div className="flex items-center gap-3">
-            <FaHeart className="text-2xl text-[#228EE5]" />
-            <h1 className="space-grotesk-bold text-3xl sm:text-4xl">
-              My Favorites
-            </h1>
-          </div>
-          <p className="inter-regular mt-3 text-sm text-slate-500 dark:text-white/50">
-            Your personal collection of favorite movies and TV shows.
-          </p>
-          <p className="inter-bold mt-3 text-sm text-[#228EE5]">
-            {favorites.length} saved {favorites.length === 1 ? "title" : "titles"}
-          </p>
-        </div>
+      <div className="mx-auto max-w-[1600px] pt-20 pl-20">
         {favorites.length === 0 ? (
           <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
             <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#228EE5]/10">
@@ -59,9 +49,15 @@ export default function Favorites() {
               You haven't added any movies or TV shows to your favorites yet.
               Explore and save the titles you love!
             </p>
+            <StarBorder onClick={() => {navigate("/")}} className="text-[15px] mt-4">
+              <span className="inline-flex items-center gap-1">
+                Explore titles
+          <IoIosArrowForward className="ml-1 mt-1"/>
+          </span>
+        </StarBorder>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-6 w-[1450px]">
             {favorites.map((title) => (
               <MoviesCard key={`${title.media_type}-${title.id}`} title={title} isFavorite={true} onToggleFavorite={handleRemoveFavorite}/>
             ))}

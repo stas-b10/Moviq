@@ -5,7 +5,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import light_logo from "../assets/images/light_logo.png"
 import dark_logo from "../assets/images/dark_logo.png"
 import { IoNotifications, IoPerson } from "react-icons/io5";
-import { MdOutlineFavoriteBorder, MdOutlineSearch } from "react-icons/md";
+import { BsFillBookmarkStarFill } from "react-icons/bs";
+import {MdOutlineSearch } from "react-icons/md";
 import Notifications from "./Notifications";
 import { supabase } from "../utils/supabase";
 
@@ -103,8 +104,8 @@ export default function Navbar() {
       <button onClick={() => navigate("/profile")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
         <IoPerson className="absolute text-[24px]" />
       </button>
-      <button onClick={() => navigate("/favorites")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
-        <MdOutlineFavoriteBorder className="absolute text-[24px]" />
+      <button onClick={() => navigate("/watchlist")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+        <BsFillBookmarkStarFill className="absolute text-[21px]" />
       </button>
       <button onClick={() => setDarkMode((prev) => !prev)} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
         {darkMode ? (<LuSun className="absolute text-[24px] -rotate-20" />  ) : ( <FaMoon className="absolute text-[24px] -rotate-20" /> )}

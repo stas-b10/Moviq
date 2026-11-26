@@ -18,7 +18,7 @@ import Profile from "./Page/Profile";
 import About from "./Page/About";
 import AllMovies from "./Page/AllMovies";
 import AllTrendings from "./Page/AllTrendings";
-import Favorites from "./Page/Favorites";
+import Watchlist from "./Page/Watchlist";
 
 export default function App() {
   const location = useLocation();
@@ -72,7 +72,7 @@ export default function App() {
               <Route path="/about" element={<About />} />
               <Route path="/all_movies" element={<AllMovies />} />
               <Route path="/all_trendings" element={<AllTrendings />} />
-              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/watchlist" element={<Watchlist />} />
               <Route path="/home" element={<Home />} />
             </Routes>
           </motion.div>
