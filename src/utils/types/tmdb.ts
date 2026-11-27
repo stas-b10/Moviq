@@ -347,3 +347,45 @@ export async function discoverSeriesByGenres(
     media_type: "tv" as const,
   }));
 }
+
+
+export async function searchTitles(
+  query: string
+): Promise<TMDBTrendingTitle[]> {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) return [];
+
+  const [movies, series] = await Promise.all([
+    invokeTMDB<TMDBListResponse>({
+      type: "movie",
+      action: "search",
+      query: normalizedQuery,
+      page: 1,
+    }),
+    invokeTMDB<TMDBListResponse>({
+      type: "tv",
+      action: "search",
+      query: normalizedQuery,
+      page: 1,
+    }),
+  ]);
+
+  const movieResults: TMDBTrendingTitle[] = (
+    movies.results ?? []
+  ).map((movie) => ({
+    ...movie,
+    media_type: "movie",
+  }));
+
+  const tvResults: TMDBTrendingTitle[] = (
+    series.results ?? []
+  ).map((show) => ({
+    ...show,
+    media_type: "tv",
+  }));
+
+  return [...movieResults, ...tvResults]
+    .sort((a, b) => b.vote_average - a.vote_average)
+    .slice(0, 10);
+}
