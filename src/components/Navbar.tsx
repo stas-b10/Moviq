@@ -10,6 +10,7 @@ import {MdOutlineSearch,MdClose } from "react-icons/md";
 import Notifications from "./Notifications";
 import { supabase } from "../utils/supabase";
 import {searchTitles,type TMDBTrendingTitle,} from "../utils/types/tmdb";
+import { ImExit } from "react-icons/im";
 
 export default function Navbar() {
   const [darkMode,setDarkMode] = useState(true);
@@ -24,6 +25,8 @@ export default function Navbar() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
   const searchWrapperRef = useRef<HTMLDivElement>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -170,25 +173,63 @@ const handleResultClick = (title: TMDBTrendingTitle) => {
   closeSearch();
 };
 
+useEffect(() => {
+  if (!profileOpen) return;
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      profileWrapperRef.current &&
+      !profileWrapperRef.current.contains(event.target as Node)
+    ) {
+      setProfileOpen(false);
+    }
+  };
+
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setProfileOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  document.addEventListener("keydown", handleEscape);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+    document.removeEventListener("keydown", handleEscape);
+  };
+}, [profileOpen]);
+
+const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout error:", error);
+      return;
+    }
+
+    navigate("/", { replace: true });
+  };
+
     
   return (
     <>
    <header className="absolute top-5 left-1/2 z-50 w-[95%] max-w-[1500px] -translate-x-1/2 rounded-[23px] p-[5px] backdrop-blur-xs bg-transparent gradient-border">
       <nav className="mx-auto flex w-full items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
-        <Link to="/home" className="absolute left-[25px] top-1/2 -translate-y-1/2"><img src={darkMode ? light_logo : dark_logo} alt="icon" className="h-20 w-20"/></Link>
-      <div className="flex items-center gap-12 ml-[280px]">
-        <Link to="/home" onClick={(e) => { if (isHome) { e.preventDefault(); }}} className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/home" ? "after:scale-x-100" : "after:scale-x-0"}`}>Home</Link>
-        <Link to="wheel" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/wheel" ? "after:scale-x-100" : "after:scale-x-0"}`}>Wheel</Link>
-        <Link to="friends" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/friends" ? "after:scale-x-100" : "after:scale-x-0"}`}>Friends</Link>
-        <Link to="movies" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/movies" ? "after:scale-x-100" : "after:scale-x-0"}`}>Movies</Link>
-        <Link to="series" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/series" ? "after:scale-x-100" : "after:scale-x-0"}`}>Series</Link>
-        <Link to="collections" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/collections" ? "after:scale-x-100" : "after:scale-x-0"}`}>Collections</Link>
-        <Link to="faq" className={`relative text-[20px] space-grotesk-bold text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors after:absolute after:left-0 after:-bottom-2 after:h-[3px] after:w-full after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/faq" ? "after:scale-x-100" : "after:scale-x-0"}`}>FAQ</Link>
-  
+        <Link to="/home" className="absolute left-[25px] top-1/2 -translate-y-1/2 "><img src={darkMode ? light_logo : dark_logo} alt="icon" className="h-20 w-20"/></Link>
+      <div className="flex items-center gap-6 ml-[220px]">
+        <Link to="/home" onClick={(e) => { if (isHome) { e.preventDefault(); }}} className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/home" ? "after:scale-x-100" : "after:scale-x-0"}`}>Home</Link>
+        <Link to="wheel" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/wheel" ? "after:scale-x-100" : "after:scale-x-0"}`}>Wheel</Link>
+        <Link to="friends" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/friends" ? "after:scale-x-100" : "after:scale-x-0"}`}>Friends</Link>
+        <Link to="movies" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/movies" ? "after:scale-x-100" : "after:scale-x-0"}`}>Movies</Link>
+        <Link to="series" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/series" ? "after:scale-x-100" : "after:scale-x-0"}`}>Series</Link>
+        <Link to="collections" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/collections" ? "after:scale-x-100" : "after:scale-x-0"}`}>Collections</Link>
+        <Link to="faq" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/faq" ? "after:scale-x-100" : "after:scale-x-0"}`}>FAQ</Link>
+        <Link to="ratings" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/ratings" ? "after:scale-x-100" : "after:scale-x-0"}`}>Ratings</Link>
       </div>
       <div className="flex flex-row gap-4">
       <div ref={searchWrapperRef} className="relative flex items-center transition-colors duration-300">
-        <button onClick={() => { if (searchOpen) { closeSearch();} else { setSearchOpen(true); setNotificationOpen(false);}}} aria-label="Search" className="relative flex h-8 w-8 cursor-pointer items-center justify-center text-[#091E51] transition-colors duration-300 dark:text-white dark:hover:text-gray-200">
+        <button onClick={() => { if (searchOpen) { closeSearch();} else { setSearchOpen(true); setNotificationOpen(false);}}} aria-label="Search" className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
           {searchOpen ? ( <MdClose className="text-[25px]" /> ) : ( <MdOutlineSearch className="text-[25px]" />)}
         </button>
          {searchOpen && (
@@ -198,7 +239,7 @@ const handleResultClick = (title: TMDBTrendingTitle) => {
                     className="shrink-0 cursor-pointer text-gray-400 transition-colors hover:text-[#091E51] dark:hover:text-white" aria-label="Search">
               <MdOutlineSearch className="text-2xl" />
             </button>
-            <input autoFocus type="text" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setSearchResults([]); setSearchError("");}} placeholder="Search movies and TV shows..." className="w-full bg-transparent text-base text-[#091E51] outline-none placeholder:text-gray-400 dark:text-white"/>
+            <input autoFocus type="text" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setSearchResults([]); setSearchError("") }} onKeyDown={(e) => { if (e.key === "Enter" && searchQuery.trim()) { navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`); closeSearch();}}} placeholder="Search movies and TV shows..." className="w-full bg-transparent text-base text-[#091E51] outline-none placeholder:text-gray-400 dark:text-white"/>
             {searchQuery && (
               <button onClick={() => { setSearchQuery(""); setSearchResults([]); setSearchError("");}} className="cursor-pointer text-gray-400 hover:text-gray-700 dark:hover:text-white" aria-label="Clear search">
                 <MdClose className="text-xl" />
@@ -267,19 +308,55 @@ const handleResultClick = (title: TMDBTrendingTitle) => {
           </div>
          )}
       </div>
-      <button onClick={() => setNotificationOpen((prev) => !prev)} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+      <button onClick={() => setNotificationOpen((prev) => !prev)} className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
         <IoNotifications className="absolute text-[24px]"/>
         {unreadCount > 0 && (
           <span className="absolute right-1 bottom-1 h-2.5 w-2.5 rounded-full border-2 border-[#030A1B] bg-red-500" />
         )}
       </button>
-      <button onClick={() => navigate("/profile")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
-        <IoPerson className="absolute text-[24px]" />
-      </button>
-      <button onClick={() => navigate("/watchlist")} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+      <div ref={profileWrapperRef} className="relative">
+         <button onClick={() => { setProfileOpen((prev) => !prev); setSearchOpen(false); setNotificationOpen(false);}} aria-label="Profile menu" aria-expanded={profileOpen}
+                 className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
+          <IoPerson className="text-[24px]" />
+         </button>
+
+         {profileOpen && (
+           <div className="absolute right-0 top-full z-[100] mt-3 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#071329]">
+              <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Profile
+              </Link>
+              <Link to="/watchlist" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Watchlist
+              </Link>
+              <Link to="/ratings" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Ratings
+              </Link>
+              <Link to="/reviews" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Reviews
+              </Link>
+              <Link to="/friends" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Friends
+              </Link>
+              <Link to="/favorites" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Favorites
+              </Link>
+              <Link to="/watched" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Watched
+              </Link>
+              <Link to="/wheels" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                My Wheels
+              </Link>
+              <button onClick={handleLogout} className="flex w-full cursor-pointer items-center rounded-xl px-3 py-3 text-left text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+                <ImExit className="mr-2"/>
+                Sign out
+              </button>
+           </div>
+         )}
+      </div>
+      <button onClick={() => navigate("/watchlist")} className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
         <BsFillBookmarkStarFill className="absolute text-[21px]" />
       </button>
-      <button onClick={() => setDarkMode((prev) => !prev)} className="relative flex h-8 w-8 items-center justify-center text-[#091E51] dark:text-white dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer">
+      <button onClick={() => setDarkMode((prev) => !prev)} className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
         {darkMode ? (<LuSun className="absolute text-[24px] -rotate-20" />  ) : ( <FaMoon className="absolute text-[24px] -rotate-20" /> )}
       </button>
       </div>
