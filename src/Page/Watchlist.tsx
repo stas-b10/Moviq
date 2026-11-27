@@ -17,12 +17,14 @@ const TITLES_PER_PAGE = 30;
 export default function Watchlist() {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   const {
     watchlist,
     isLoading,
     error,
     removeFromWatchlist,
+    clearWatchlist,
   } = useWatchlist();
 
   const totalPages = Math.ceil(watchlist.length / TITLES_PER_PAGE);
@@ -88,9 +90,33 @@ export default function Watchlist() {
   );
 }
 
+const handleDeleteAll = async () => {
+  if (watchlist.length === 0 || isDeletingAll) return;
+
+  setIsDeletingAll(true);
+
+  try {
+    await clearWatchlist();
+    setCurrentPage(1);
+  } finally {
+    setIsDeletingAll(false);
+  }
+};
+
+
+
   return (
     <main className="min-h-screen bg-[#EBFAFF] px-6 py-12 text-slate-950 dark:bg-[#030A1B] dark:text-white sm:px-10">
       <div className="mx-auto max-w-[1600px] pt-20 pl-20">
+        <div className="pb-10 flex relative justify-between">
+          <h2 className="space-grotesk-bold mt-5 max-w-3xl text-3xl font-black leading-[1.05] tracking-tight">Watchlist:</h2>
+           {watchlist.length > 0 && (
+          <button onClick={handleDeleteAll} disabled={watchlist.length === 0 || isDeletingAll} className="flex items-center justify-center gap-2 rounded-xl border border-slate-900/10 bg-white/75 px-7 py-2 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer mr-15">
+            {isDeletingAll ? (<ImSpinner2 className="animate-spin" />) : null}
+            <span className="text-center inter-bold">{isDeletingAll ? "Deleting..." : "Delete All"}</span>
+          </button>
+          )}
+        </div>
         {error && (
           <p className="mb-6 text-center text-sm text-red-500">
             {error}
@@ -147,7 +173,7 @@ export default function Watchlist() {
               </div>
             )}
 
-            <p className="ml-4 mt-5 text-center text-sm text-slate-500 dark:text-white/40">
+            <p className="ml-4 mt-8 text-center text-sm text-slate-500 dark:text-white/40">
               Showing {startIndex + 1}–
               {Math.min(startIndex + TITLES_PER_PAGE, watchlist.length)} of{" "}
               {watchlist.length} titles

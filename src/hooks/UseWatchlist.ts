@@ -173,6 +173,33 @@ export function useWatchlist() {
     );
   };
 
+
+const clearWatchlist = async () => {
+  const userId = userIdRef.current;
+
+  if (!userId) {
+    setError("Please sign in to manage your watchlist.");
+    return;
+  }
+
+  setError(null);
+
+  const { error } = await supabase
+    .from("user_watchlist")
+    .delete()
+    .eq("user_id", userId);
+
+  if (error) {
+    setError(error.message);
+    return;
+  }
+
+  if (userIdRef.current !== userId) return;
+
+  setWatchlist([]);
+};
+
+
   const toggleWatchlist = async (title: TMDBTrendingTitle) => {
     const exists = watchlist.some(
       (item) =>
@@ -193,5 +220,7 @@ export function useWatchlist() {
     addToWatchlist,
     removeFromWatchlist,
     toggleWatchlist,
+    clearWatchlist,
   };
 }
+
