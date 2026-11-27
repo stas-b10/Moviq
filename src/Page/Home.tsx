@@ -13,6 +13,7 @@ import {
   getTvGenres,
   discoverSeriesByGenres,
 } from "../utils/types/tmdb";
+import { useWatchlist } from "../hooks/UseWatchlist";
 import {FaArrowLeft, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
@@ -58,6 +59,7 @@ export default function Home() {
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const seriesGenreSwiperRef = useRef<SwiperType | null>(null);
   const [favorites, setFavorites] = useState<TMDBTrendingTitle[]>(() => { try { return JSON.parse(localStorage.getItem("favorites") || "[]");} catch {return [];}});
+  const {watchlist,toggleWatchlist} = useWatchlist();
 
   useEffect(() => {
   let active = true;
@@ -833,7 +835,7 @@ useEffect(() => {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {trending.slice(0, 50).map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <TrendingCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
+                  <TrendingCard title={title} rating={ enrichments[`${title.media_type}-${title.id}`]?.imdbRating } isFavorite={watchlist.some((item) =>item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={() => {void toggleWatchlist(title)}}/>
                 </SwiperSlide>
               ))}
             </div>
@@ -944,7 +946,7 @@ useEffect(() => {
             >
               {filteredMovies.map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <MoviesCard title={title} isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
+                  <MoviesCard title={title} isFavorite={watchlist.some((item) =>item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={() => {void toggleWatchlist(title)}}/>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -1070,7 +1072,7 @@ useEffect(() => {
             >
               {filteredSeries.map((title) => (
                 <SwiperSlide key={`${title.media_type}-${title.id}`} className="!h-auto !overflow-visible py-4 px-2">
-                  <SeriesCard title={title} isFavorite={favorites.some( (item) => item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={handleToggleFavorite}/>
+                  <SeriesCard title={title} isFavorite={watchlist.some((item) =>item.id === title.id && item.media_type === title.media_type)} onToggleFavorite={() => {void toggleWatchlist(title)}}/>
                 </SwiperSlide>
               ))}
             </Swiper>
