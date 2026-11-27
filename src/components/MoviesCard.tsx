@@ -42,7 +42,7 @@ export default function MoviesCard({
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10 opacity-80" />
         <button type="button" onClick={handleFavoriteClick} aria-label={ isFavorite ? `Remove ${name} from favorites` : `Add ${name} to favorites`} aria-pressed={isFavorite}  title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                className={`absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition duration-200 hover:scale-110 ${ isFavorite ? "border-[#228EE5] bg-[#228EE5] text-white" : "border-white/30 bg-black/40 text-white cursor-pointer" }`}
+                className={`absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition duration-200 hover:scale-110 ${ isFavorite ? "border-[#228EE5] bg-[#228EE5] text-white cursor-pointer" : "border-white/30 bg-black/40 text-white cursor-pointer" }`}
         >
           {isFavorite ? (
             <FaCheck className="text-sm" />
