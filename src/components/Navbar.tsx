@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { FaMoon, FaStar } from "react-icons/fa6";
+import { FaMoon, FaStar, FaTv } from "react-icons/fa6";
 import { LuSun } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import light_logo from "../assets/images/light_logo.png"
 import dark_logo from "../assets/images/dark_logo.png"
 import { IoNotifications, IoPerson } from "react-icons/io5";
 import { BsFillBookmarkStarFill } from "react-icons/bs";
-import {MdOutlineSearch,MdClose, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import {MdOutlineSearch,MdClose, MdOutlineKeyboardArrowDown, MdReviews, MdFavorite } from "react-icons/md";
 import Notifications from "./Notifications";
 import { supabase } from "../utils/supabase";
 import {searchTitles,type TMDBTrendingTitle,} from "../utils/types/tmdb";
 import { ImExit } from "react-icons/im";
+import { FaUserFriends } from "react-icons/fa";
 
 export default function Navbar() {
   const [darkMode,setDarkMode] = useState(true);
@@ -29,6 +30,7 @@ export default function Navbar() {
   const profileWrapperRef = useRef<HTMLDivElement>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [joinedAt, setJoinedAt] = useState<string | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -214,12 +216,16 @@ const handleLogout = async () => {
   };
 
   useEffect(() => {
+  let active = true;
+
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
       .select("avatar_url, username")
       .eq("id", userId)
       .maybeSingle();
+
+    if (!active) return;
 
     if (error) {
       console.error("Error fetching navbar profile:", error);
@@ -231,34 +237,52 @@ const handleLogout = async () => {
   };
 
   const loadUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    if (user) {
-      await fetchProfile(user.id);
-    } else {
+    if (!active) return;
+
+    if (error || !user) {
       setAvatarUrl(null);
       setUsername(null);
+      setJoinedAt(null);
+      return;
     }
+
+    setJoinedAt(user.created_at);
+    await fetchProfile(user.id);
   };
 
   void loadUser();
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    (event, session) => {
-      if (event === "SIGNED_OUT" || !session?.user) {
-        setAvatarUrl(null);
-        setUsername(null);
-        return;
-      }
-
-      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
-        void fetchProfile(session.user.id);
-      }
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" || !session?.user) {
+      setAvatarUrl(null);
+      setUsername(null);
+      setJoinedAt(null);
+      return;
     }
-  );
 
-  return () => subscription.unsubscribe();
+    if (
+      event === "SIGNED_IN" ||
+      event === "USER_UPDATED" ||
+      event === "INITIAL_SESSION"
+    ) {
+      setJoinedAt(session.user.created_at);
+      void fetchProfile(session.user.id);
+    }
+  });
+
+  return () => {
+    active = false;
+    subscription.unsubscribe();
+  };
 }, []);
+
 
     
   return (
@@ -378,35 +402,62 @@ const handleLogout = async () => {
         </button>
 
          {profileOpen && (
-           <div className="absolute right-0 top-full z-[100] mt-3 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#071329]">
-              <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Profile
-              </Link>
-              <Link to="/watchlist" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Watchlist
-              </Link>
-              <Link to="/ratings" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Ratings
-              </Link>
-              <Link to="/reviews" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Reviews
-              </Link>
-              <Link to="/friends" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Friends
-              </Link>
-              <Link to="/favorites" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Favorites
-              </Link>
-              <Link to="/watched" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Watched
-              </Link>
-              <Link to="/wheels" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                My Wheels
-              </Link>
-              <button onClick={handleLogout} className="flex w-full cursor-pointer items-center rounded-xl px-3 py-3 text-left text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
-                <ImExit className="mr-2"/>
-                Sign out
-              </button>
+           <div className="absolute right-0 top-full z-[100] mt-3 w-72 overflow-hidden rounded-2xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-white/10 dark:bg-[#071329]">
+            <div className="flex items-center gap-3 px-2 py-3"> 
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[#228EE5]">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover"/>
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <IoPerson className="text-3xl text-[#091E51] dark:text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-base font-bold text-[#091E51] dark:text-white">
+                  {username || "User"}
+                </p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Joined{" "}
+                  {joinedAt ? new Date(joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric",}) : "Recently"}
+                </p>
+              </div>
+            </div>
+            <div className="my-2 h-px bg-gray-200 dark:bg-white/10" />
+             <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <IoPerson className="mb-0.5 mr-3"/>
+              My Profile
+             </Link>
+             <Link to="/wishlist" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <BsFillBookmarkStarFill className="mb-0.5 mr-3"/>
+              My Wishlist
+             </Link>
+             <Link to="/ratings" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <FaStar className="mb-0.5 mr-3"/>
+              My Ratings
+             </Link>
+             <Link to="/reviews" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <MdReviews className="mb-0.5 mr-3"/>
+              My Reviews
+             </Link>
+             <Link to="/friends" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <FaUserFriends className="mb-0.5 mr-3"/>
+              My Friends
+             </Link>
+             <Link to="/favorites" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <MdFavorite className="mb-0.5 mr-3"/>
+              My Favorites
+             </Link>
+             <Link to="/watched" onClick={() => setProfileOpen(false)} className="flex items-center rounded-xl px-3 py-3 text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <FaTv className="mb-0.5 mr-3"/>
+              My Watched
+             </Link>
+
+             <div className="my-2 h-px bg-gray-200 dark:bg-white/10" />
+             <button onClick={handleLogout} className="flex w-full cursor-pointer items-center rounded-xl px-3 py-3 text-left text-[15px] inter-bold text-[#091E51] transition-colors duration-300 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10">
+              <ImExit className="mr-2" />
+              Sign out
+             </button>
            </div>
          )}
       </div>
