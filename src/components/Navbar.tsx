@@ -6,7 +6,7 @@ import light_logo from "../assets/images/light_logo.png"
 import dark_logo from "../assets/images/dark_logo.png"
 import { IoNotifications, IoPerson } from "react-icons/io5";
 import { BsFillBookmarkStarFill } from "react-icons/bs";
-import {MdOutlineSearch,MdClose } from "react-icons/md";
+import {MdOutlineSearch,MdClose, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import Notifications from "./Notifications";
 import { supabase } from "../utils/supabase";
 import {searchTitles,type TMDBTrendingTitle,} from "../utils/types/tmdb";
@@ -27,6 +27,8 @@ export default function Navbar() {
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileWrapperRef = useRef<HTMLDivElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -211,13 +213,60 @@ const handleLogout = async () => {
     navigate("/", { replace: true });
   };
 
+  useEffect(() => {
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("avatar_url, username")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error fetching navbar profile:", error);
+      return;
+    }
+
+    setAvatarUrl(data?.avatar_url ?? null);
+    setUsername(data?.username ?? null);
+  };
+
+  const loadUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      await fetchProfile(user.id);
+    } else {
+      setAvatarUrl(null);
+      setUsername(null);
+    }
+  };
+
+  void loadUser();
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      if (event === "SIGNED_OUT" || !session?.user) {
+        setAvatarUrl(null);
+        setUsername(null);
+        return;
+      }
+
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        void fetchProfile(session.user.id);
+      }
+    }
+  );
+
+  return () => subscription.unsubscribe();
+}, []);
+
     
   return (
     <>
    <header className="absolute top-5 left-1/2 z-50 w-[95%] max-w-[1500px] -translate-x-1/2 rounded-[23px] p-[5px] backdrop-blur-xs bg-transparent gradient-border">
       <nav className="mx-auto flex w-full items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Link to="/home" className="absolute left-[25px] top-1/2 -translate-y-1/2 "><img src={darkMode ? light_logo : dark_logo} alt="icon" className="h-20 w-20"/></Link>
-      <div className="flex items-center gap-6 ml-[220px]">
+      <div className="flex items-center gap-6 ml-[180px]">
         <Link to="/home" onClick={(e) => { if (isHome) { e.preventDefault(); }}} className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/home" ? "after:scale-x-100" : "after:scale-x-0"}`}>Home</Link>
         <Link to="wheel" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/wheel" ? "after:scale-x-100" : "after:scale-x-0"}`}>Wheel</Link>
         <Link to="friends" className={`relative rounded-xl px-3 py-2 text-[20px] space-grotesk-bold text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200 after:absolute after:left-3 after:-bottom-1 after:h-[3px] after:w-[calc(100%-24px)] after:rounded-full after:bg-[#228EE5] after:transition-transform after:duration-300 ${location.pathname === "/friends" ? "after:scale-x-100" : "after:scale-x-0"}`}>Friends</Link>
@@ -229,7 +278,7 @@ const handleLogout = async () => {
       </div>
       <div className="flex flex-row gap-4">
       <div ref={searchWrapperRef} className="relative flex items-center transition-colors duration-300">
-        <button onClick={() => { if (searchOpen) { closeSearch();} else { setSearchOpen(true); setNotificationOpen(false);}}} aria-label="Search" className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
+        <button onClick={() => { if (searchOpen) { closeSearch();} else { setSearchOpen(true); setNotificationOpen(false);}}} aria-label="Search" className="relative flex h-10 w-10 cursor-pointer mb-1 items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
           {searchOpen ? ( <MdClose className="text-[25px]" /> ) : ( <MdOutlineSearch className="text-[25px]" />)}
         </button>
          {searchOpen && (
@@ -315,10 +364,18 @@ const handleLogout = async () => {
         )}
       </button>
       <div ref={profileWrapperRef} className="relative">
-         <button onClick={() => { setProfileOpen((prev) => !prev); setSearchOpen(false); setNotificationOpen(false);}} aria-label="Profile menu" aria-expanded={profileOpen}
-                 className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#091E51] transition-colors duration-300 hover:bg-white/30 dark:text-white dark:hover:bg-white/10 dark:hover:text-gray-200">
-          <IoPerson className="text-[24px]" />
-         </button>
+        <button type="button" onClick={() => { setProfileOpen((prev) => !prev); setSearchOpen(false); setNotificationOpen(false);}} aria-label="Profile menu" aria-expanded={profileOpen} className="flex cursor-pointer items-center gap-1.5 rounded-xl px-1 py-0.5 transition-colors duration-300 hover:bg-white/30 dark:hover:bg-white/10">
+          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-[#228EE5]">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={username ? `${username}'s avatar` : "Profile avatar"} className="h-full w-full object-cover"/>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <IoPerson className="text-2xl text-[#091E51] dark:text-white" />
+              </div>
+            )}
+          </div>
+          <MdOutlineKeyboardArrowDown className={`shrink-0 text-[18px] text-[#091E51] transition-transform duration-200 dark:text-white ${ profileOpen ? "rotate-180" : ""}`}/>
+        </button>
 
          {profileOpen && (
            <div className="absolute right-0 top-full z-[100] mt-3 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#071329]">
